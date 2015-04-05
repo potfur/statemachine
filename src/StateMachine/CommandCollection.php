@@ -54,7 +54,8 @@ final class CommandCollection implements \Countable
      */
     public function resetStatus()
     {
-        $this->status = array_fill(0, count($this->commands), null);
+        $count = count($this->commands);
+        $this->status = $count > 0 ? array_fill(0, $count, null) : [];
     }
 
     /**
