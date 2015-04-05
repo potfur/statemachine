@@ -50,7 +50,7 @@ final class GenericCollection implements \Countable
     private function assertInstanceOf($element)
     {
         $instanceOf = $this->instanceOf;
-        if ($instanceOf && !$element instanceof $instanceOf) {
+        if ($instanceOf !== null && !$element instanceof $instanceOf) {
             throw new InvalidArgumentException(sprintf('Element in collection must be instance of "%s", got "%s"', $instanceOf, $this->getType($element)));
         }
     }
