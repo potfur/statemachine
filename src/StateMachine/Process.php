@@ -34,7 +34,7 @@ final class Process implements ProcessInterface
     private $initialState;
 
     /**
-     * @var StateInterface[]
+     * @var GenericCollection|StateInterface[]
      */
     private $states = [];
 

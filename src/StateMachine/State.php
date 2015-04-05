@@ -17,12 +17,12 @@ final class State implements StateInterface
     private $name;
 
     /**
-     * @var Event[]
+     * @var GenericCollection|Event[]
      */
     private $events;
 
     /**
-     * @var Flag[]
+     * @var GenericCollection|Flag[]
      */
     private $flags;
 
