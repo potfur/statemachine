@@ -11,6 +11,18 @@
 
 namespace StateMachine;
 
+class FakeBaseClass
+{
+    public function __toString()
+    {
+        return 'fakeClass';
+    }
+}
+
+class FakeExtendingClass extends FakeBaseClass
+{
+}
+
 
 class GenericCollectionTest extends \PHPUnit_Framework_TestCase
 {
@@ -50,10 +62,10 @@ class GenericCollectionTest extends \PHPUnit_Framework_TestCase
 
     public function testSetProperInstance()
     {
-        $element = $this->getMockBuilder('\SplFileInfo')->disableOriginalConstructor()->getMock(); // because this extends mocked class
+        $element = $this->getMockBuilder('\StateMachine\FakeExtendingClass')->disableOriginalConstructor()->getMock();
         $element->expects($this->any())->method('__toString')->willReturn('key');
 
-        $collection = new GenericCollection([], '\SplFileInfo');
+        $collection = new GenericCollection([], '\StateMachine\FakeBaseClass');
         $collection->set($element);
         $this->assertEquals($element, $collection->get('key'));
     }
