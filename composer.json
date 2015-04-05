@@ -1,0 +1,26 @@
+{
+  "name": "potfur/statemachine",
+  "version": "v0.1",
+  "description": "State machine",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Michal Wachowski",
+      "email": "wachowski.michal@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.4"
+  },
+  "require-dev": {
+    "phpunit/phpunit": ">=3.7",
+    "phpmd/phpmd": "~2.2",
+    "squizlabs/php_codesniffer": "~2.3"
+  },
+  "config": {
+    "bin-dir": "bin"
+  },
+  "autoload": {
+    "psr-4": {"StateMachine\\": "./src/StateMachine"}
+  }
+}
