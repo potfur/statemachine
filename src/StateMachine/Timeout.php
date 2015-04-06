@@ -21,6 +21,7 @@ use StateMachine\Exception\InvalidArgumentException;
 class Timeout
 {
     private $state;
+    private $event;
     private $identifier;
     private $execution;
 
