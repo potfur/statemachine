@@ -37,7 +37,7 @@ Sample process looks like this
  * starts in initial state - `new`
  * from `new` trough `goPending` event to `pending`
  * because `pending` has `onStateWasSet` which is resolved automatically when reaching state go to `done` if commands were executed successfully or to `error` otherwise
- * in `error` it needs to be triggered manually with `returnPending` event
+ * since `error` has `onTimeOut` event - it will be triggered automatically after set interval (1s) and will go to `pending`
  * this time `pending` is executed successfully and again, because `onStateWasSet` no event triggering is needed, this time moves to `done`
 
 ```php
