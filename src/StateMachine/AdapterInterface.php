@@ -11,6 +11,11 @@
 
 namespace StateMachine;
 
+/**
+ * Interface for schema reading adapters
+ *
+ * @package StateMachine
+ */
 interface AdapterInterface
 {
     /**
