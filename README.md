@@ -23,7 +23,12 @@ Cons:
  - _context_ can end in undefined (eg. removed) _state_
 
 **Work in progress**
-- next step - timeout event
+
+Next steps
+ - timeout events - **done**
+ - locks for concurrent runs
+ - adapters for other formats: YAML/XML
+ - factory for different schemas
 
 ## Sample run
 
