@@ -19,6 +19,13 @@ namespace StateMachine;
 interface PayloadInterface
 {
     /**
+     * Return subject identifier
+     *
+     * @return mixed
+     */
+    public function getIdentifier();
+
+    /**
      * Return true if state has changed (even if it was changed back to itself)
      *
      * @return bool

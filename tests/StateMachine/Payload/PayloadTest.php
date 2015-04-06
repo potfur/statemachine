@@ -14,9 +14,15 @@ namespace StateMachine\Payload;
 
 class PayloadTest extends \PHPUnit_Framework_TestCase
 {
+    public function testIdentifier()
+    {
+        $payload = new Payload('id', new \stdClass());
+        $this->assertEquals('id', $payload->getIdentifier());
+    }
+
     public function testHasChangedBecauseOfStatusChange()
     {
-        $payload = new Payload(new \stdClass());
+        $payload = new Payload('id', new \stdClass());
         $this->assertFalse($payload->hasChanged());
 
         $payload->setState('foo');
@@ -25,7 +31,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
 
     public function testHasNotChangedBecauseOfFlagChange()
     {
-        $payload = new Payload(new \stdClass());
+        $payload = new Payload('id', new \stdClass());
         $this->assertFalse($payload->hasChanged());
 
         $flag = $this->getMockBuilder('\StateMachine\Flag')->disableOriginalConstructor()->getMock();
@@ -36,7 +42,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
 
     public function testDidNotReadStateOrFlagsFromScalarSubject()
     {
-        new Payload([]);
+        new Payload('id', []);
     }
 
     public function testStateWasReadFromStateAwareSubject()
@@ -44,7 +50,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
         $subject = $this->getMock('\StateMachine\Payload\StateAwareInterface');
         $subject->expects($this->once())->method('getState');
 
-        new Payload($subject);
+        new Payload('id', $subject);
     }
 
     public function testFlagsFromFlagAwareSubjectWereConvertedBackToVO()
@@ -52,7 +58,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
         $subject = $this->getMock('\StateMachine\Payload\FlagAwareInterface');
         $subject->expects($this->once())->method('getFlags')->willReturn(['flagName' => 'flagValue']);
 
-        $payload = new Payload($subject);
+        $payload = new Payload('id', $subject);
         $flag = $payload->getFlag('flagName');
 
         $this->assertInstanceOf('\StateMachine\Flag', $flag);
@@ -65,7 +71,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
         $subject = $this->getMock('\StateMachine\Payload\FlagAwareInterface');
         $subject->expects($this->once())->method('getFlags');
 
-        new Payload($subject);
+        new Payload('id', $subject);
     }
 
     public function testSetStateWithStateAwareSubject()
@@ -73,7 +79,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
         $subject = $this->getMock('\StateMachine\Payload\StateAwareInterface');
         $subject->expects($this->once())->method('setState')->with('stateName');
 
-        $payload = new Payload($subject);
+        $payload = new Payload('id', $subject);
         $payload->setState('stateName');
     }
 
@@ -82,7 +88,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
         $subject = $this->getMock('\stdClass', ['setState']);
         $subject->expects($this->never())->method('setState');
 
-        $payload = new Payload($subject);
+        $payload = new Payload('id', $subject);
         $payload->setState('stateName');
     }
 
@@ -90,7 +96,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
     {
         $subject = $this->getMock('\stdClass');
 
-        $payload = new Payload($subject);
+        $payload = new Payload('id', $subject);
         $payload->setState('stateName');
 
         $this->assertEquals('stateName', $payload->getState());
@@ -105,7 +111,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
         $subject = $this->getMock('\StateMachine\Payload\FlagAwareInterface');
         $subject->expects($this->once())->method('setFlags')->with(['flagName' => 'flagValue']);
 
-        $payload = new Payload($subject);
+        $payload = new Payload('id', $subject);
         $payload->setFlag($flag);
     }
 
@@ -116,7 +122,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
         $subject = $this->getMock('\stdClass', ['setState']);
         $subject->expects($this->never())->method('setFlags');
 
-        $payload = new Payload($subject);
+        $payload = new Payload('id', $subject);
         $payload->setFlag($flag);
     }
 
@@ -127,7 +133,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
 
         $subject = $this->getMock('\stdClass');
 
-        $payload = new Payload($subject);
+        $payload = new Payload('id', $subject);
         $payload->setFlag($flag);
 
         $this->assertEquals($flag, $payload->getFlag('flagName'));
@@ -137,7 +143,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
     {
         $subject = $this->getMock('\stdClass');
 
-        $payload = new Payload($subject);
+        $payload = new Payload('id', $subject);
         $payload->setState('firstState');
         $payload->setState('secondState');
         $payload->setState('thirdState');
@@ -150,7 +156,7 @@ class PayloadTest extends \PHPUnit_Framework_TestCase
         $subjectA = $this->getMock('\stdClass');
         $subjectB = $this->getMock('\stdClass');
 
-        $payload = new Payload($subjectA);
+        $payload = new Payload('id', $subjectA);
         $this->assertSame($subjectA, $payload->getSubject());
 
         $payload->setSubject($subjectB);

@@ -39,6 +39,11 @@ final class Payload implements PayloadInterface
     private $history = [];
 
     /**
+     * @var mixed
+     */
+    private $identifier;
+
+    /**
      * @var mixed|StateAwareInterface|FlagAwareInterface
      */
     private $subject;
@@ -47,10 +52,12 @@ final class Payload implements PayloadInterface
      * Constructor
      * Creates payload around subject
      *
-     * @param $subject
+     * @param mixed $identifier
+     * @param mixed $subject
      */
-    public function __construct($subject)
+    public function __construct($identifier, $subject)
     {
+        $this->identifier = $identifier;
         $this->subject = $subject;
 
         if (!is_object($subject)) {
@@ -101,6 +108,16 @@ final class Payload implements PayloadInterface
     private function isFlagAware()
     {
         return is_object($this->subject) && $this->subject instanceof FlagAwareInterface;
+    }
+
+    /**
+     * Return subject identifier
+     *
+     * @return mixed
+     */
+    public function getIdentifier()
+    {
+        return $this->identifier;
     }
 
     /**
