@@ -108,6 +108,16 @@ final class Process implements ProcessInterface
     }
 
     /**
+     * Return all states
+     *
+     * @return State[]
+     */
+    public function getStates()
+    {
+        return $this->states->all();
+    }
+
+    /**
      * Return state from collection by its name
      *
      * @param string $name

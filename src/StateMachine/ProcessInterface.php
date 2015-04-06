@@ -33,6 +33,13 @@ interface ProcessInterface
     public function getInitialStateName();
 
     /**
+     * Return all states
+     *
+     * @return State[]
+     */
+    public function getStates();
+
+    /**
      * Trigger event for payload
      * Return array with all transitional state names
      *
