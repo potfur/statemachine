@@ -23,12 +23,104 @@ Cons:
  - _context_ can end in undefined (eg. removed) _state_
 
 **Work in progress**
+- next step - timeout event
 
 ## Sample run
 
 Sample run consists of two files - `schema.php` and `index.php`
+Sample process looks like this
+ * starts in initial state - `new`
+ * from `new` trough `goPending` event to `pending`
+ * because `pending` has `onStateWasSet` which is resolved automatically when reaching state go to `done` if commands were executed successfully or to `error` otherwise
+ * in `error` it needs to be triggered manually with `returnPending` event
+ * this time `pending` is executed successfully and again, because `onStateWasSet` no event triggering is needed, this time moves to `done`
 
 ```php
+<?php
+// index php
+
+namespace {
+    require __DIR__ . '/vendor/autoload.php';
+}
+
+namespace Fake {
+    use StateMachine\Payload\FlagAwareInterface;
+    use StateMachine\Payload\Payload;
+    use StateMachine\Payload\StateAwareInterface;
+    use StateMachine\PayloadHandlerInterface;
+    use StateMachine\PayloadInterface;
+
+    final class FakeSubject extends \stdClass implements StateAwareInterface, FlagAwareInterface
+    {
+        private $identifier;
+        private $state;
+        private $flags = [];
+
+        public function __construct($identifier)
+        {
+            $this->identifier = $identifier;
+        }
+
+        public function setState($name)
+        {
+            $this->state = $name;
+        }
+
+        public function getState()
+        {
+            return $this->state;
+        }
+
+        public function setFlags(array $flags)
+        {
+            $this->flags = array_merge($this->flags, $flags);
+        }
+
+        public function getFlags()
+        {
+            return $this->flags;
+        }
+    }
+
+    final class FakePayloadHandler implements PayloadHandlerInterface
+    {
+        private $payload = [];
+
+        public function restore($identifier)
+        {
+            $identifier = (string) $identifier;
+
+            if (!array_key_exists($identifier, $this->payload)) {
+                $this->payload[$identifier] = new Payload(new FakeSubject($identifier));
+            }
+
+            return $this->payload[$identifier];
+        }
+
+        public function store(PayloadInterface $payload)
+        {
+            var_dump($payload);
+        }
+    }
+}
+
+namespace Test {
+    use Fake\FakePayloadHandler;
+    use StateMachine\Adapter\ArrayAdapter;
+    use StateMachine\StateMachine;
+
+    $adapter = new ArrayAdapter(require __DIR__ . '/schema.php');
+    $handler = new FakePayloadHandler();
+
+    $machine = new StateMachine($adapter, $handler);
+    $machine->triggerEvent('goPending', 'FakeIdentifier');
+    $machine->triggerEvent('returnPending', 'FakeIdentifier');
+}
+```
+
+```php
+
+<?php
 <?php
 // schema.php
 
@@ -41,12 +133,6 @@ $commandResult = [
 ];
 
 $command = function (\StateMachine\Payload\Payload $payload) use (&$commandResult) {
-
-    $history = $payload->getHistory();
-    $subject = $payload->getSubject();
-    $subject->process[] = implode(array_slice($history, -2, 1)) . ' -> ' . implode(array_splice($history, -1, 1));
-    $payload->setSubject($subject);
-
     return array_shift($commandResult);
 };
 
@@ -90,7 +176,7 @@ return [
             ],
             'events' => [
                 [
-                    'name' => \StateMachine\Process::ON_STATE_WAS_SET,
+                    'name' => 'returnPending',
                     'targetState' => 'pending',
                     'errorState' => 'error',
                     'commands' => [$command]
@@ -106,44 +192,4 @@ return [
         ]
     ]
 ];
-```
-
-```php
-<?php
-// index.php
-
-namespace {
-    require __DIR__ . '/vendor/autoload.php';
-}
-
-namespace Fake {
-    use StateMachine\Payload\Payload;
-    use StateMachine\PayloadHandlerInterface;
-    use StateMachine\PayloadInterface;
-
-    class FakePayloadHandler implements PayloadHandlerInterface
-    {
-        public function restore($identifier)
-        {
-            return $payload = new Payload((object) ['identifier' => $identifier, 'process' => []]);
-        }
-
-        public function store(PayloadInterface $payload)
-        {
-            var_dump($payload);
-        }
-    }
-}
-
-namespace Test {
-    use Fake\FakePayloadHandler;
-    use StateMachine\Adapter\ArrayAdapter;
-    use StateMachine\StateMachine;
-
-    $adapter = new ArrayAdapter(require __DIR__ . '/schema.php');
-    $handler = new FakePayloadHandler();
-
-    $machine = new StateMachine($adapter, $handler);
-    $machine->triggerEvent('goPending', 'FakeIdentifier');
-}
 ```
