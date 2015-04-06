@@ -71,46 +71,6 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('\stdClass', $process->getSubjectClass());
     }
 
-    public function testStates()
-    {
-        $this->state->expects($this->any())->method('__toString')->willReturn('stateName');
-
-        $process = new Process('processName', '\stdClass', 'stateName', [$this->state]);
-
-        $this->assertEquals(['stateName' => $this->state], $process->getStates());
-    }
-
-    public function testHasState()
-    {
-        $this->state->expects($this->any())->method('__toString')->willReturn('stateName');
-
-        $process = new Process('processName', '\stdClass', 'stateName', [$this->state]);
-
-        $this->assertFalse($process->hasState('undefinedState'));
-        $this->assertTrue($process->hasState('stateName'));
-    }
-
-    public function testGetState()
-    {
-        $this->state->expects($this->any())->method('__toString')->willReturn('stateName');
-
-        $process = new Process('processName', '\stdClass', 'stateName', [$this->state]);
-
-        $this->assertSame($this->state, $process->getState('stateName'));
-    }
-
-    /**
-     * @expectedException \StateMachine\Exception\OutOfRangeException
-     * @expectedExceptionMessage Element for offset "undefinedState" not found
-     */
-    public function testGetUndefinedState()
-    {
-        $this->state->expects($this->any())->method('__toString')->willReturn('stateName');
-
-        $process = new Process('processName', '\stdClass', 'stateName', [$this->state]);
-        $process->getState('undefinedState');
-    }
-
     /**
      * @expectedException \StateMachine\Exception\InvalidSubjectException
      * @expectedExceptionMessage Unable to trigger with invalid payload in process "processName" - got "string", expected "\stdClass"
@@ -226,5 +186,54 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
         $process = new Process('processName', '\stdClass', 'stateName', [$this->state, $transitionState, $finalState]);
         $process->triggerEvent('eventName', $this->payload);
+    }
+
+    public function testHasTimeout()
+    {
+        $this->state->expects($this->any())->method('__toString')->willReturn('stateName');
+        $this->state->expects($this->any())->method('getName')->willReturn('stateName');
+        $this->state->expects($this->any())->method('hasEvent')->willReturn(true);
+
+        $this->payload->expects($this->any())->method('getState')->willReturn('stateName');
+
+        $process = new Process('processName', '\stdClass', 'stateName', [$this->state]);
+        $this->assertTrue($process->hasTimeout($this->payload));
+    }
+
+    public function testDoesNotHaveTimeout()
+    {
+        $this->state->expects($this->any())->method('__toString')->willReturn('stateName');
+        $this->state->expects($this->any())->method('getName')->willReturn('stateName');
+        $this->state->expects($this->any())->method('hasEvent')->willReturn(false);
+
+        $this->payload->expects($this->any())->method('getState')->willReturn('stateName');
+
+        $process = new Process('processName', '\stdClass', 'stateName', [$this->state]);
+        $this->assertFalse($process->hasTimeout($this->payload));
+    }
+
+    public function testGetTimeout()
+    {
+        $date = new \DateTime();
+
+        $event = $this->getMockBuilder('\StateMachine\Event')->disableOriginalConstructor()->getMock();
+        $event->expects($this->any())->method('getTimeout')->willReturn($date);
+
+        $this->state->expects($this->any())->method('__toString')->willReturn('stateName');
+        $this->state->expects($this->any())->method('getName')->willReturn('stateName');
+        $this->state->expects($this->any())->method('getEvent')->willReturn($event);
+
+        $this->payload->expects($this->any())->method('getState')->willReturn('stateName');
+        $this->payload->expects($this->any())->method('getIdentifier')->willReturn('identifier');
+
+        $process = new Process('processName', '\stdClass', 'stateName', [$this->state]);
+        $timeout = $process->getTimeout($this->payload, $date);
+
+        $this->assertInstanceOf('\StateMachine\Timeout', $timeout);
+
+        $this->assertEquals('stateName', $timeout->getState());
+        $this->assertEquals(Process::ON_TIME_OUT, $timeout->getEvent());
+        $this->assertEquals('identifier', $timeout->getIdentifier());
+        $this->assertEquals($date, $timeout->getExecutionDate());
     }
 }

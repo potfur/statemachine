@@ -33,31 +33,6 @@ interface ProcessInterface
     public function getInitialStateName();
 
     /**
-     * Return all states
-     *
-     * @return StateInterface[]
-     */
-    public function getStates();
-
-    /**
-     * Return true if event exists in collection
-     *
-     * @param string $name
-     *
-     * @return bool
-     */
-    public function hasState($name);
-
-    /**
-     * Return event with given name
-     *
-     * @param string $name
-     *
-     * @return StateInterface
-     */
-    public function getState($name);
-
-    /**
      * Trigger event for payload
      * Return array with all transitional state names
      *
@@ -67,4 +42,23 @@ interface ProcessInterface
      * @return array
      */
     public function triggerEvent($event, PayloadInterface $payload);
+
+    /**
+     * Return true if payloads state has timeout event
+     *
+     * @param PayloadInterface $payload
+     *
+     * @return bool
+     */
+    public function hasTimeout(PayloadInterface $payload);
+
+    /**
+     * Return timeout object for payloads state timeout event
+     *
+     * @param PayloadInterface $payload
+     * @param \DateTime        $now date will be used as reference for timeouts defined as intervals
+     *
+     * @return Timeout
+     */
+    public function getTimeout(PayloadInterface $payload, \DateTime $now);
 }

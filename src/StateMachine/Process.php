@@ -56,7 +56,7 @@ final class Process implements ProcessInterface
 
         $this->states = new GenericCollection($states, '\StateMachine\StateInterface');
 
-        if (!$this->hasState($this->initialState)) {
+        if (!$this->states->has($this->initialState)) {
             throw new InvalidStateException(sprintf('Initial state "%s" does not exist in process "%s"', $this->initialState, $this->getName()));
         }
     }
@@ -108,35 +108,13 @@ final class Process implements ProcessInterface
     }
 
     /**
-     * Return all states
-     *
-     * @return StateInterface[]
-     */
-    public function getStates()
-    {
-        return $this->states->all();
-    }
-
-    /**
-     * Return true if event exists in collection
+     * Return state from collection by its name
      *
      * @param string $name
      *
-     * @return bool
+     * @return State
      */
-    public function hasState($name)
-    {
-        return $this->states->has($name);
-    }
-
-    /**
-     * Return event with given name
-     *
-     * @param string $name
-     *
-     * @return StateInterface
-     */
-    public function getState($name)
+    private function getState($name)
     {
         return $this->states->get($name);
     }
@@ -224,5 +202,33 @@ final class Process implements ProcessInterface
         foreach ((array) $state->getFlags() as $flag) {
             $payload->setFlag($flag);
         }
+    }
+
+    /**
+     * Return true if payloads state has timeout event
+     *
+     * @param PayloadInterface $payload
+     *
+     * @return bool
+     */
+    public function hasTimeout(PayloadInterface $payload)
+    {
+        return $this->getState($payload->getState())->hasEvent(self::ON_TIME_OUT);
+    }
+
+    /**
+     * Return timeout object for payloads state timeout event
+     *
+     * @param PayloadInterface $payload
+     * @param \DateTime        $now date will be used as reference for timeouts defined as intervals
+     *
+     * @return Timeout
+     */
+    public function getTimeout(PayloadInterface $payload, \DateTime $now)
+    {
+        $state = $this->getState($payload->getState());
+        $event = $state->getEvent(self::ON_TIME_OUT);
+
+        return new Timeout($state->getName(), self::ON_TIME_OUT, $payload->getIdentifier(), $event->getTimeout($now));
     }
 }
