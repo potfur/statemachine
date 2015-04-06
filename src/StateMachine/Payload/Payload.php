@@ -160,11 +160,9 @@ final class Payload implements PayloadInterface
     {
         $this->flags[$flag->getName()] = $flag;
 
-        if (!$this->isFlagAware()) {
-            return;
+        if ($this->isFlagAware()) {
+            $this->subject->setFlags($this->convertFlagsToArray($this->flags));
         }
-
-        $this->subject->setFlags($this->convertFlagsToArray($this->flags));
     }
 
     /**
