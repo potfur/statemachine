@@ -26,6 +26,7 @@ use StateMachine\State;
 class ArrayAdapter implements AdapterInterface
 {
     private $schema;
+    private $process;
 
     /**
      * Construct
@@ -152,12 +153,16 @@ class ArrayAdapter implements AdapterInterface
      */
     public function getProcess()
     {
-        return new Process(
-            $this->getSchemaName(),
-            $this->getSubjectClass(),
-            $this->getInitialState(),
-            $this->buildStates()
-        );
+        if ($this->process === null) {
+            $this->process = new Process(
+                $this->getSchemaName(),
+                $this->getSubjectClass(),
+                $this->getInitialState(),
+                $this->buildStates()
+            );
+        }
+
+        return $this->process;
     }
 
     /**
