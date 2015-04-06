@@ -7,6 +7,7 @@
 
 StateMachine is an implementation of _non-deterministic finite automata_ (this can be also subsumed under _state pattern_ implementation).
 In different words - machine will move _context_ from one state to another, depending on result of executed _commands_.
+
 StateMachine can be used to describe order & payment processing, newsletter opt-in process, customer registration - anything not trivial.
 In such case order becomes _context_, _states_ represent all stages of order processing and _commands_ will execute all those things like generating invoices, sending mails etc.
 
