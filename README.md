@@ -49,8 +49,10 @@ namespace Fake {
     use StateMachine\Payload\StateAwareInterface;
     use StateMachine\PayloadHandlerInterface;
     use StateMachine\PayloadInterface;
+    use StateMachine\Timeout;
+    use StateMachine\TimeoutHandlerInterface;
 
-    final class FakeSubject extends \stdClass implements StateAwareInterface, FlagAwareInterface
+    class FakeSubject extends \stdClass implements StateAwareInterface, FlagAwareInterface
     {
         private $identifier;
         private $state;
@@ -82,7 +84,7 @@ namespace Fake {
         }
     }
 
-    final class FakePayloadHandler implements PayloadHandlerInterface
+    class FakePayloadHandler implements PayloadHandlerInterface
     {
         private $payload = [];
 
@@ -91,7 +93,7 @@ namespace Fake {
             $identifier = (string) $identifier;
 
             if (!array_key_exists($identifier, $this->payload)) {
-                $this->payload[$identifier] = new Payload(new FakeSubject($identifier));
+                $this->payload[$identifier] = new Payload($identifier, new FakeSubject($identifier));
             }
 
             return $this->payload[$identifier];
@@ -102,25 +104,60 @@ namespace Fake {
             var_dump($payload);
         }
     }
+
+    class FakeTimeoutHandler implements TimeoutHandlerInterface
+    {
+        /** @var Timeout[] */
+        private $timeouts = [];
+
+        public function getExpired()
+        {
+            $now = time();
+            $result = [];
+            foreach ($this->timeouts as $timeout) {
+                if ($timeout->getExecutionDate()->getTimestamp() < $now) {
+                    $result[] = $timeout;
+                }
+            }
+
+            return $result;
+        }
+
+        public function remove(Timeout $timeout)
+        {
+            unset($this->timeouts[$timeout->getIdentifier()]);
+        }
+
+        public function store(Timeout $timeout)
+        {
+            $this->timeouts[$timeout->getIdentifier()] = $timeout;
+        }
+    }
 }
 
 namespace Test {
     use Fake\FakePayloadHandler;
+    use Fake\FakeTimeoutHandler;
     use StateMachine\Adapter\ArrayAdapter;
     use StateMachine\StateMachine;
 
     $adapter = new ArrayAdapter(require __DIR__ . '/schema.php');
-    $handler = new FakePayloadHandler();
+    $payloadHandler = new FakePayloadHandler();
+    $timeoutHandler = new FakeTimeoutHandler();
 
-    $machine = new StateMachine($adapter, $handler);
-    $machine->triggerEvent('goPending', 'FakeIdentifier');
-    $machine->triggerEvent('returnPending', 'FakeIdentifier');
+    $machine = new StateMachine($adapter, $payloadHandler, $timeoutHandler);
+
+    var_dump($machine->triggerEvent('goPending', 'FakeIdentifier')); // manual trigger, stores timeout
+
+    usleep(800000); // 0.8s
+    var_dump($machine->resolveTimeouts()); // no expires, nothing to do
+
+    usleep(1500000); // 1.5s
+    var_dump($machine->resolveTimeouts()); // now expired
 }
 ```
 
 ```php
-
-<?php
 <?php
 // schema.php
 
@@ -133,6 +170,10 @@ $commandResult = [
 ];
 
 $command = function (\StateMachine\Payload\Payload $payload) use (&$commandResult) {
+    if (!count($commandResult)) {
+        die('RUN OUT OF RESULTS');
+    }
+
     return array_shift($commandResult);
 };
 
@@ -176,9 +217,10 @@ return [
             ],
             'events' => [
                 [
-                    'name' => 'returnPending',
+                    'name' => \StateMachine\Process::ON_TIME_OUT,
                     'targetState' => 'pending',
                     'errorState' => 'error',
+                    'timeout' => new \DateInterval('PT1S'),
                     'commands' => [$command]
                 ]
             ],
