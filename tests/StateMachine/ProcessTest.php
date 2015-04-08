@@ -36,15 +36,6 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \StateMachine\Exception\InvalidStateException
-     * @expectedExceptionMessage Initial state "undefinedState" does not exist in process "processName"
-     */
-    public function testInitialStateDoesNotExists()
-    {
-        new Process('processName', '\stdClass', 'undefinedState', []);
-    }
-
-    /**
      * @expectedException \StateMachine\Exception\InvalidArgumentException
      * @expectedExceptionMessage Invalid process name, can not be empty string
      */
@@ -69,6 +60,33 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $process = new Process('processName', '\stdClass', 'stateName', [$this->state]);
 
         $this->assertEquals('\stdClass', $process->getSubjectClass());
+    }
+
+    /**
+     * @expectedException \StateMachine\Exception\InvalidStateException
+     * @expectedExceptionMessage Initial state "undefinedState" does not exist in process "processName"
+     */
+    public function testInitialStateDoesNotExists()
+    {
+        new Process('processName', '\stdClass', 'undefinedState', []);
+    }
+
+    public function testInitialState()
+    {
+        $this->state->expects($this->any())->method('__toString')->willReturn('initialState');
+
+        $process = new Process('processName', '\stdClass', 'initialState', [$this->state]);
+
+        $this->assertEquals('initialState', $process->getInitialStateName());
+    }
+
+    public function testStates()
+    {
+        $this->state->expects($this->any())->method('__toString')->willReturn('initialState');
+
+        $process = new Process('processName', '\stdClass', 'initialState', [$this->state]);
+
+        $this->assertEquals(['initialState' => $this->state], $process->getStates());
     }
 
     /**
