@@ -12,8 +12,8 @@
 namespace StateMachine\Renderer;
 
 use StateMachine\AdapterInterface;
-use StateMachine\Event;
-use StateMachine\State;
+use StateMachine\EventInterface;
+use StateMachine\StateInterface;
 
 /**
  * State machine process renderer
@@ -155,11 +155,11 @@ class Renderer
     /**
      * Create state for dot notation
      *
-     * @param State $state
+     * @param StateInterface $state
      *
      * @return StateDot
      */
-    private function createState(State $state)
+    private function createState(StateInterface $state)
     {
         return new StateDot(
             $state->getName(),
@@ -173,13 +173,13 @@ class Renderer
     /**
      * Create edge for dot notation
      *
-     * @param State  $state
-     * @param Event  $event
+     * @param StateInterface  $state
+     * @param EventInterface  $event
      * @param string $type
      *
      * @return EdgeDot
      */
-    private function createEdge(State $state, Event $event, $type)
+    private function createEdge(StateInterface $state, EventInterface $event, $type)
     {
         return new EdgeDot(
             $state->getName(),

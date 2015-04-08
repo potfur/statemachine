@@ -17,7 +17,7 @@ final class State implements StateInterface
     private $name;
 
     /**
-     * @var GenericCollection|Event[]
+     * @var GenericCollection|EventInterface[]
      */
     private $events;
 
@@ -28,7 +28,7 @@ final class State implements StateInterface
 
     /**
      * @param string  $name
-     * @param Event[] $events
+     * @param EventInterface[] $events
      * @param Flag[]  $flags
      */
     public function __construct($name, array $events = [], array $flags = [])
@@ -36,7 +36,7 @@ final class State implements StateInterface
         $this->assertName($name);
 
         $this->name = $name;
-        $this->events = new GenericCollection($events, '\StateMachine\Event');
+        $this->events = new GenericCollection($events, '\StateMachine\EventInterface');
         $this->flags = new GenericCollection($flags, '\StateMachine\Flag');
     }
 
@@ -101,7 +101,7 @@ final class State implements StateInterface
     /**
      * Return event collection
      *
-     * @return Event[]
+     * @return EventInterface[]
      */
     public function getEvents()
     {
@@ -125,7 +125,7 @@ final class State implements StateInterface
      *
      * @param string $name
      *
-     * @return Event
+     * @return EventInterface
      */
     public function getEvent($name)
     {

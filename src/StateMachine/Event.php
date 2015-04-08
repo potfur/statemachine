@@ -18,7 +18,7 @@ use StateMachine\Exception\InvalidArgumentException;
  *
  * @package StateMachine
  */
-class Event
+final class Event implements EventInterface
 {
     /**
      * Event name

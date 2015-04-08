@@ -14,7 +14,7 @@ namespace StateMachine;
 class StateTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var Event|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $event;
 
@@ -25,7 +25,7 @@ class StateTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->event = $this->getMockBuilder('\StateMachine\Event')->disableOriginalConstructor()->getMock();
+        $this->event = $this->getMockBuilder('\StateMachine\EventInterface')->disableOriginalConstructor()->getMock();
         $this->event->expects($this->any())->method('__toString')->willReturn('eventName');
 
         $this->flag = $this->getMockBuilder('\StateMachine\Flag')->disableOriginalConstructor()->getMock();
@@ -34,7 +34,7 @@ class StateTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \StateMachine\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Element in collection must be instance of "\StateMachine\Event", got "string"
+     * @expectedExceptionMessage Element in collection must be instance of "\StateMachine\EventInterface", got "string"
      */
     public function testProvidedInvalidEvent()
     {

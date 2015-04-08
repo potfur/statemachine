@@ -12,7 +12,6 @@
 namespace StateMachine\Renderer;
 
 use StateMachine\AdapterInterface;
-use StateMachine\Event;
 use StateMachine\ProcessInterface;
 use StateMachine\StateInterface;
 
@@ -98,7 +97,7 @@ class RendererTest extends \PHPUnit_Framework_TestCase
 
     public function testDotFormatWithEvent()
     {
-        $event = $this->getMockBuilder('\StateMachine\Event')->disableOriginalConstructor()->getMock();
+        $event = $this->getMockBuilder('\StateMachine\EventInterface')->disableOriginalConstructor()->getMock();
         $event->expects($this->any())->method('getName')->willReturn('eventName');
         $event->expects($this->any())->method('getTargetState')->willReturn('targetState');
         $event->expects($this->any())->method('getErrorState')->willReturn('errorState');

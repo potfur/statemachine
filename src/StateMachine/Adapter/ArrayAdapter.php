@@ -14,6 +14,7 @@ namespace StateMachine\Adapter;
 use StateMachine\AdapterInterface;
 use StateMachine\CommandCollection;
 use StateMachine\Event;
+use StateMachine\EventInterface;
 use StateMachine\Flag;
 use StateMachine\Process;
 use StateMachine\State;
@@ -109,7 +110,7 @@ class ArrayAdapter implements AdapterInterface
      *
      * @param array $state
      *
-     * @return Event[]
+     * @return EventInterface[]
      */
     private function buildEvents($state)
     {

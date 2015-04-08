@@ -234,7 +234,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     {
         $date = new \DateTime();
 
-        $event = $this->getMockBuilder('\StateMachine\Event')->disableOriginalConstructor()->getMock();
+        $event = $this->getMockBuilder('\StateMachine\EventInterface')->disableOriginalConstructor()->getMock();
         $event->expects($this->any())->method('getTimeout')->willReturn($date);
 
         $this->state->expects($this->any())->method('__toString')->willReturn('stateName');

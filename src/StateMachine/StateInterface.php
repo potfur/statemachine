@@ -44,7 +44,7 @@ interface StateInterface
     /**
      * Return event collection
      *
-     * @return Event[]
+     * @return EventInterface[]
      */
     public function getEvents();
 
@@ -62,7 +62,7 @@ interface StateInterface
      *
      * @param string $name
      *
-     * @return Event
+     * @return EventInterface
      */
     public function getEvent($name);
 
