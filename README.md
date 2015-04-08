@@ -29,3 +29,4 @@ Cons:
  - adapters for other formats: YAML/XML
  - factory for different schemas
 
+![](https://github.com/potfur/statemachine/wiki/schema.png)
