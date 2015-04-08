@@ -12,6 +12,8 @@
 namespace StateMachine\Renderer;
 
 use StateMachine\AdapterInterface;
+use StateMachine\Event;
+use StateMachine\State;
 
 /**
  * State machine process renderer
@@ -132,39 +134,15 @@ class Renderer
         );
 
         foreach ($this->adapter->getProcess()->getStates() as $state) {
-            $process->addState(
-                new StateDot(
-                    $state->getName(),
-                    $state->getFlags(),
-                    $this->colors['state']['color'],
-                    $this->colors['state']['text'],
-                    $this->colors['state']['flag']
-                )
-            );
+            $process->addState($this->createState($state));
 
             foreach ($state->getEvents() as $event) {
                 if ($event->getTargetState()) {
-                    $process->addEdge(
-                        new EdgeDot(
-                            $state->getName(),
-                            $event->getTargetState(),
-                            $event->getName(),
-                            $this->colors['target']['color'],
-                            $this->colors['target']['text']
-                        )
-                    );
+                    $process->addEdge($this->createEdge($state, $event, 'target'));
                 }
 
                 if ($event->getErrorState()) {
-                    $process->addEdge(
-                        new EdgeDot(
-                            $state->getName(),
-                            $event->getErrorState(),
-                            $event->getName(),
-                            $this->colors['error']['color'],
-                            $this->colors['error']['text']
-                        )
-                    );
+                    $process->addEdge($this->createEdge($state, $event, 'error'));
                 }
             }
         }
@@ -172,6 +150,44 @@ class Renderer
         file_put_contents($outputFile, (string) $process);
 
         return $outputFile;
+    }
+
+    /**
+     * Create state for dot notation
+     *
+     * @param State $state
+     *
+     * @return StateDot
+     */
+    private function createState(State $state)
+    {
+        return new StateDot(
+            $state->getName(),
+            $state->getFlags(),
+            $this->colors['state']['color'],
+            $this->colors['state']['text'],
+            $this->colors['state']['flag']
+        );
+    }
+
+    /**
+     * Create edge for dot notation
+     *
+     * @param State  $state
+     * @param Event  $event
+     * @param string $type
+     *
+     * @return EdgeDot
+     */
+    private function createEdge(State $state, Event $event, $type)
+    {
+        return new EdgeDot(
+            $state->getName(),
+            $type === 'target' ? $event->getTargetState() : $event->getErrorState(),
+            $event->getName(),
+            $this->colors[$type]['color'],
+            $this->colors[$type]['text']
+        );
     }
 
     /**
