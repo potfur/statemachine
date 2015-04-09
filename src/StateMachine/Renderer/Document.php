@@ -16,7 +16,7 @@ namespace StateMachine\Renderer;
  *
  * @package StateMachine
  */
-final class ProcessDot implements DotInterface
+final class Document implements DotInterface
 {
     private $name;
     private $dpi;

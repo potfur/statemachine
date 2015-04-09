@@ -16,7 +16,7 @@ namespace StateMachine\Renderer;
  *
  * @package StateMachine
  */
-final class EdgeDot implements DotInterface
+final class Edge implements DotInterface
 {
     private $fromState;
     private $toState;

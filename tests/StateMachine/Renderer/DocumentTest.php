@@ -11,7 +11,7 @@
 
 namespace StateMachine\Renderer;
 
-class ProcessDotTest extends \PHPUnit_Framework_TestCase
+class DocumentTest extends \PHPUnit_Framework_TestCase
 {
     public function testToStringWithNodes()
     {
@@ -23,7 +23,7 @@ class ProcessDotTest extends \PHPUnit_Framework_TestCase
 
         $expected = 'digraph processName {dpi="75";pad="1";fontname="Courier";nodesep="1";rankdir="TD";ranksep="0.5";*STATE*;*EDGE*;}';
 
-        $dot = new ProcessDot('processName', 75, 'Courier');
+        $dot = new Document('processName', 75, 'Courier');
         $dot->addState($state);
         $dot->addEdge($path);
         $this->assertEquals($expected, (string) $dot);
@@ -39,7 +39,7 @@ class ProcessDotTest extends \PHPUnit_Framework_TestCase
 
         $expected = 'digraph processName {dpi="75";pad="1";fontname="Courier";nodesep="1";rankdir="TD";ranksep="0.5";}';
 
-        $dot = new ProcessDot('processName', 75, 'Courier');
+        $dot = new Document('processName', 75, 'Courier');
         $this->assertEquals($expected, (string) $dot);
     }
 }

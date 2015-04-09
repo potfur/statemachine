@@ -11,13 +11,13 @@
 
 namespace StateMachine\Renderer;
 
-class EdgeDotTest extends \PHPUnit_Framework_TestCase
+class EdgeTest extends \PHPUnit_Framework_TestCase
 {
     public function testToString()
     {
         $expected = 'edge[dir="forward",style="solid",color="#ffffff",fontcolor="#000000"] state_fromState -> state_toState [label=" eventName"];';
 
-        $dot = new EdgeDot('fromState', 'toState', 'eventName', '#ffffff', '#000000');
+        $dot = new Edge('fromState', 'toState', 'eventName', '#ffffff', '#000000');
         $this->assertEquals($expected, (string) $dot);
     }
 }

@@ -18,7 +18,7 @@ use StateMachine\Flag;
  *
  * @package StateMachine
  */
-class StateDot implements DotInterface
+class Node implements DotInterface
 {
     private $state;
     private $flags;

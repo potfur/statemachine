@@ -127,27 +127,21 @@ class Renderer
      */
     public function dot($outputFile)
     {
-        $process = new ProcessDot(
+        $document = new Document(
             $this->adapter->getProcess()->getName(),
             $this->dpi,
             $this->font
         );
 
         foreach ($this->adapter->getProcess()->getStates() as $state) {
-            $process->addState($this->createState($state));
+            $this->addState($document, $state);
 
             foreach ($state->getEvents() as $event) {
-                if ($event->getTargetState()) {
-                    $process->addEdge($this->createEdge($state, $event, 'target'));
-                }
-
-                if ($event->getErrorState()) {
-                    $process->addEdge($this->createEdge($state, $event, 'error'));
-                }
+                $this->addEvent($document, $state, $event);
             }
         }
 
-        file_put_contents($outputFile, (string) $process);
+        file_put_contents($outputFile, (string) $document);
 
         return $outputFile;
     }
@@ -155,39 +149,54 @@ class Renderer
     /**
      * Create state for dot notation
      *
+     * @param Document       $document
      * @param StateInterface $state
-     *
-     * @return StateDot
      */
-    private function createState(StateInterface $state)
+    private function addState(Document $document, StateInterface $state)
     {
-        return new StateDot(
-            $state->getName(),
-            $state->getFlags(),
-            $this->colors['state']['color'],
-            $this->colors['state']['text'],
-            $this->colors['state']['flag']
+        $document->addState(
+            new Node(
+                $state->getName(),
+                $state->getFlags(),
+                $this->colors['state']['color'],
+                $this->colors['state']['text'],
+                $this->colors['state']['flag']
+            )
         );
     }
 
     /**
      * Create edge for dot notation
      *
-     * @param StateInterface  $state
-     * @param EventInterface  $event
-     * @param string $type
-     *
-     * @return EdgeDot
+     * @param Document       $document
+     * @param StateInterface $state
+     * @param EventInterface $event
      */
-    private function createEdge(StateInterface $state, EventInterface $event, $type)
+    private function addEvent(Document $document, StateInterface $state, EventInterface $event)
     {
-        return new EdgeDot(
-            $state->getName(),
-            $type === 'target' ? $event->getTargetState() : $event->getErrorState(),
-            $event->getName(),
-            $this->colors[$type]['color'],
-            $this->colors[$type]['text']
-        );
+        if ($event->getTargetState()) {
+            $document->addEdge(
+                new Edge(
+                    $state->getName(),
+                    $event->getTargetState(),
+                    $event->getName(),
+                    $this->colors['target']['color'],
+                    $this->colors['target']['text']
+                )
+            );
+        }
+
+        if ($event->getErrorState()) {
+            $document->addEdge(
+                new Edge(
+                    $state->getName(),
+                    $event->getErrorState(),
+                    $event->getName(),
+                    $this->colors['error']['color'],
+                    $this->colors['error']['text']
+                )
+            );
+        }
     }
 
     /**
