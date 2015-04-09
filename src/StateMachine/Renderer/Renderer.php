@@ -175,27 +175,11 @@ class Renderer
     private function addEvent(Document $document, StateInterface $state, EventInterface $event)
     {
         if ($event->getTargetState()) {
-            $document->addEdge(
-                new Edge(
-                    $state->getName(),
-                    $event->getTargetState(),
-                    $event->getName(),
-                    $this->colors['target']['color'],
-                    $this->colors['target']['text']
-                )
-            );
+            $document->addEdge(new Edge($state->getName(), $event->getTargetState(), $event->getName(), $this->colors['target']['color'], $this->colors['target']['text']));
         }
 
         if ($event->getErrorState()) {
-            $document->addEdge(
-                new Edge(
-                    $state->getName(),
-                    $event->getErrorState(),
-                    $event->getName(),
-                    $this->colors['error']['color'],
-                    $this->colors['error']['text']
-                )
-            );
+            $document->addEdge(new Edge($state->getName(), $event->getErrorState(), $event->getName(), $this->colors['error']['color'], $this->colors['error']['text']));
         }
     }
 
