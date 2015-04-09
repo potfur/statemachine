@@ -175,12 +175,33 @@ class Renderer
     private function addEvent(Document $document, StateInterface $state, EventInterface $event)
     {
         if ($event->getTargetState()) {
-            $document->addEdge(new Edge($state->getName(), $event->getTargetState(), $event->getName(), $this->colors['target']['color'], $this->colors['target']['text']));
+            $document->addEdge($this->createEdge($state, $event, $event->getTargetState(), $this->colors['target']));
         }
 
         if ($event->getErrorState()) {
-            $document->addEdge(new Edge($state->getName(), $event->getErrorState(), $event->getName(), $this->colors['error']['color'], $this->colors['error']['text']));
+            $document->addEdge($this->createEdge($state, $event, $event->getErrorState(), $this->colors['error']));
         }
+    }
+
+    /**
+     * Create edge for dot notation
+     *
+     * @param StateInterface $state
+     * @param EventInterface $event
+     * @param string         $nextState
+     * @param array          $colors
+     *
+     * @return Edge
+     */
+    private function createEdge(StateInterface $state, EventInterface $event, $nextState, $colors)
+    {
+        return new Edge(
+            $state->getName(),
+            $nextState,
+            $event->getName(),
+            $colors['color'],
+            $colors['text']
+        );
     }
 
     /**
