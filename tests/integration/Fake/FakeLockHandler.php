@@ -32,14 +32,14 @@ class FakeLockHandler implements LockHandlerInterface
         $this->locks[$identifier] = false;
     }
 
-    public function releaseTimedOut(\DateInterval $interval)
-    {
-        $this->locks = [];
-    }
-
     public function isLocked($identifier)
     {
         return !empty($this->locks[$identifier]);
+    }
+
+    public function releaseTimedOut(\DateInterval $interval)
+    {
+        $this->locks = [];
     }
 
     public function wasLocked($identifier)

@@ -111,6 +111,10 @@ class StateMachine
      */
     private function resolveTimeout(ProcessInterface $process, Timeout $timeout, &$result)
     {
+        if ($this->lockHandler->isLocked($timeout->getIdentifier())) {
+            return;
+        }
+
         $this->lockHandler->lock($timeout->getIdentifier());
         $payload = $this->payloadHandler->restore($timeout->getIdentifier());
 

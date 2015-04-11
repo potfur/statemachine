@@ -161,6 +161,25 @@ class StateMachineTest extends \PHPUnit_Framework_TestCase
         $machine->resolveTimeouts();
     }
 
+    public function testResolveTimeoutsAndLockWithPayloadInCorrectStateButLocked()
+    {
+        $timeout = $this->getMockBuilder('\StateMachine\Timeout')->disableOriginalConstructor()->getMock();
+        $timeout->expects($this->any())->method('getState')->willReturn('timeout');
+        $timeout->expects($this->any())->method('getIdentifier')->willReturn('identifier');
+
+        $this->timeoutHandler->expects($this->any())->method('getExpired')->willReturn([$timeout]);
+        $this->lockHandler->expects($this->any())->method('isLocked')->willReturn(true);
+        $this->payload->expects($this->any())->method('getState')->willReturn('timeout');
+        $this->payloadHandler->expects($this->any())->method('restore')->willReturn($this->payload);
+        $this->adapter->expects($this->any())->method('getProcess')->willReturn($this->process);
+
+        $this->lockHandler->expects($this->never())->method('lock')->with('identifier');
+        $this->lockHandler->expects($this->never())->method('release')->with('identifier');
+
+        $machine = new StateMachine($this->adapter, $this->payloadHandler, $this->timeoutHandler, $this->lockHandler);
+        $machine->resolveTimeouts();
+    }
+
     public function testResolveTimeoutsWithoutAny()
     {
         $this->timeoutHandler->expects($this->any())->method('getExpired')->willReturn([]);

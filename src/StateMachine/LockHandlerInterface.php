@@ -33,6 +33,15 @@ interface LockHandlerInterface
     public function release($identifier);
 
     /**
+     * Check if identifier is locked
+     *
+     * @param string $identifier
+     *
+     * @return bool
+     */
+    public function isLocked($identifier);
+
+    /**
      * Release locks older than now minus passed interval
      *
      * @param \DateInterval $interval
