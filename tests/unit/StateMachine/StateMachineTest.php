@@ -134,6 +134,7 @@ class StateMachineTest extends \PHPUnit_Framework_TestCase
         $this->timeoutHandler->expects($this->any())->method('getExpired')->willReturn([$timeout]);
         $this->payload->expects($this->any())->method('getState')->willReturn('differentState');
         $this->payloadHandler->expects($this->any())->method('restore')->willReturn($this->payload);
+        $this->adapter->expects($this->any())->method('getProcess')->willReturn($this->process);
 
         $this->lockHandler->expects($this->once())->method('lock')->with('identifier');
         $this->lockHandler->expects($this->once())->method('release')->with('identifier');
@@ -180,6 +181,7 @@ class StateMachineTest extends \PHPUnit_Framework_TestCase
         $this->timeoutHandler->expects($this->any())->method('getExpired')->willReturn([$timeout]);
         $this->payload->expects($this->any())->method('getState')->willReturn('differentState');
         $this->payloadHandler->expects($this->any())->method('restore')->willReturn($this->payload);
+        $this->adapter->expects($this->any())->method('getProcess')->willReturn($this->process);
 
         $this->timeoutHandler->expects($this->once())->method('remove');
         $this->process->expects($this->never())->method('triggerEvent');
