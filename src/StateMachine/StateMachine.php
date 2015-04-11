@@ -96,21 +96,30 @@ class StateMachine
         $timeouts = $this->timeoutHandler->getExpired();
 
         foreach ($timeouts as $timeout) {
-            $this->lockHandler->lock($timeout->getIdentifier());
-            $payload = $this->payloadHandler->restore($timeout->getIdentifier());
-
-            if ($payload->getState() !== $timeout->getState()) {
-                $this->timeoutHandler->remove($timeout);
-                $this->lockHandler->release($timeout->getIdentifier());
-                continue;
-            }
-
-            $result[$timeout->getIdentifier()] = $this->resolveEvent($process, $payload, $timeout->getEvent());
-            $this->timeoutHandler->remove($timeout);
-            $this->lockHandler->release($timeout->getIdentifier());
+            $this->resolveTimeout($process, $timeout, $result);
         }
 
         return $result;
+    }
+
+    /**
+     * Resolve single timeout
+     *
+     * @param ProcessInterface $process
+     * @param Timeout          $timeout
+     * @param  array           $result
+     */
+    private function resolveTimeout(ProcessInterface $process, Timeout $timeout, &$result)
+    {
+        $this->lockHandler->lock($timeout->getIdentifier());
+        $payload = $this->payloadHandler->restore($timeout->getIdentifier());
+
+        if ($payload->getState() === $timeout->getState()) {
+            $result[$timeout->getIdentifier()] = $this->resolveEvent($process, $payload, $timeout->getEvent());
+        }
+
+        $this->timeoutHandler->remove($timeout);
+        $this->lockHandler->release($timeout->getIdentifier());
     }
 
     /**
