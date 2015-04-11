@@ -18,6 +18,8 @@ namespace StateMachine;
  */
 class StateMachine
 {
+    const LOCK_TIMEOUT_INTERVAL = 'PT1H';
+
     /**
      * @var AdapterInterface
      */
@@ -34,17 +36,24 @@ class StateMachine
     private $timeoutHandler;
 
     /**
+     * @var LockHandlerInterface
+     */
+    private $lockHandler;
+
+    /**
      * Constructor
      *
      * @param AdapterInterface        $adapter
      * @param PayloadHandlerInterface $payloadHandler
      * @param TimeoutHandlerInterface $timeoutHandler
+     * @param LockHandlerInterface    $lockHandler
      */
-    public function __construct(AdapterInterface $adapter, PayloadHandlerInterface $payloadHandler, TimeoutHandlerInterface $timeoutHandler)
+    public function __construct(AdapterInterface $adapter, PayloadHandlerInterface $payloadHandler, TimeoutHandlerInterface $timeoutHandler, LockHandlerInterface $lockHandler)
     {
         $this->adapter = $adapter;
         $this->payloadHandler = $payloadHandler;
         $this->timeoutHandler = $timeoutHandler;
+        $this->lockHandler = $lockHandler;
     }
 
     /**
@@ -60,9 +69,15 @@ class StateMachine
     public function triggerEvent($event, $identifier)
     {
         $process = $this->adapter->getProcess();
-        $payload = $this->payloadHandler->restore($identifier);
 
-        return $this->resolveEvent($process, $payload, $event);
+        $this->lockHandler->lock($identifier);
+
+        $payload = $this->payloadHandler->restore($identifier);
+        $history = $this->resolveEvent($process, $payload, $event);
+
+        $this->lockHandler->release($identifier);
+
+        return $history;
     }
 
     /**
@@ -74,20 +89,25 @@ class StateMachine
      */
     public function resolveTimeouts()
     {
+        $this->lockHandler->releaseTimedOut(new \DateInterval(self::LOCK_TIMEOUT_INTERVAL));
+
         $result = [];
         $process = $this->adapter->getProcess();
         $timeouts = $this->timeoutHandler->getExpired();
 
         foreach ($timeouts as $timeout) {
+            $this->lockHandler->lock($timeout->getIdentifier());
             $payload = $this->payloadHandler->restore($timeout->getIdentifier());
 
             if ($payload->getState() !== $timeout->getState()) {
                 $this->timeoutHandler->remove($timeout);
+                $this->lockHandler->release($timeout->getIdentifier());
                 continue;
             }
 
             $result[$timeout->getIdentifier()] = $this->resolveEvent($process, $payload, $timeout->getEvent());
             $this->timeoutHandler->remove($timeout);
+            $this->lockHandler->release($timeout->getIdentifier());
         }
 
         return $result;
