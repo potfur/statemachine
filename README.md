@@ -1,18 +1,32 @@
 # StateMachine
 
-StateMachine is an implementation of **state pattern**.
-This means that we have **context** for which we can define **process** described by **states** with specific behaviour.
-**Context** also called **subject** can be anything, order & payment processing, newsletter opt-in process, customer registration - anything not trivial.
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/potfur/statemachine/badges/quality-score.png?b=dev)](https://scrutinizer-ci.com/g/potfur/statemachine/?branch=dev)
+[![Code Coverage](https://scrutinizer-ci.com/g/potfur/statemachine/badges/coverage.png?b=dev)](https://scrutinizer-ci.com/g/potfur/statemachine/?branch=dev)
+[![Build Status](https://scrutinizer-ci.com/g/potfur/statemachine/badges/build.png?b=dev)](https://scrutinizer-ci.com/g/potfur/statemachine/build-status/dev)
+[![License](https://poser.pugx.org/potfur/statemachine/license.svg)](https://packagist.org/packages/potfur/statemachine)
+
+StateMachine is an implementation of _non-deterministic finite automata_ (this can be also subsumed under _state pattern_ implementation).
+In different words - machine will move _context_ from one state to another, depending on result of executed _commands_.
+
+StateMachine can be used to describe order & payment processing, newsletter opt-in process, customer registration - anything not trivial.
+In such case order becomes _context_, _states_ represent all stages of order processing and _commands_ will execute all those things like generating invoices, sending mails etc.
+
+Documentation is available in [wiki](https://github.com/potfur/statemachine/wiki).
 
 Pros:
  + improves decoupling (also decoupling from framework)
- + **state** specific behaviour is described by simple **commands** and not as monolithic classes,
- + **process** and **states** can be easily modified,
- + **commands** can be shared between **states**, **processes** and **contexts**
+ + _state_ specific behaviour is described by simple _commands_ and not as monolithic classes,
+ + _process_ and _states_ can be easily modified,
+ + _commands_ can be shared between _states_, _processes_ and _contexts_
 
 Cons:
- - scatters behaviour to other objects that are not necessary connected to **context**
+ - scatters behaviour to other objects that are not necessary connected to _context_
  - can lead to code duplication
- - **context** can end in undefined (eg. removed) **state**
+ - _context_ can end in undefined (eg. removed) _state_
 
-_Look into dev branch_
+## Next steps
+ - locks for concurrent runs - **done**
+ - factory for different schemas
+ - PSR3 LoggerAwareInterface
+
+![](https://github.com/potfur/statemachine/wiki/schema.png)
