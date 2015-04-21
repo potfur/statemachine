@@ -28,21 +28,21 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testRegister()
     {
-        $facade = new Factory();
+        $factory = new Factory();
 
-        $this->assertFalse($facade->has('foo'));
+        $this->assertFalse($factory->has('foo'));
 
-        $facade->register('foo', function () { });
+        $factory->register('foo', function () { });
 
-        $this->assertTrue($facade->has('foo'));
+        $this->assertTrue($factory->has('foo'));
     }
 
     public function testGet()
     {
-        $facade = new Factory();
-        $facade->register('foo', function () { return $this->machine; });
+        $factory = new Factory();
+        $factory->register('foo', function () { return $this->machine; });
 
-        $this->assertInstanceOf('\StateMachine\StateMachine', $facade->get('foo'));
+        $this->assertInstanceOf('\StateMachine\StateMachine', $factory->get('foo'));
     }
 
     /**
@@ -51,37 +51,37 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetUnregistered()
     {
-        $facade = new Factory();
-        $facade->get('foo');
+        $factory = new Factory();
+        $factory->get('foo');
     }
 
     public function testTriggerEvent()
     {
         $this->machine->expects($this->once())->method('triggerEvent')->with('bar', 1);
-        $facade = new Factory();
-        $facade->register('foo', function () { return $this->machine; });
-        $facade->triggerEvent('foo', 'bar', 1);
+        $factory = new Factory();
+        $factory->register('foo', function () { return $this->machine; });
+        $factory->triggerEvent('foo', 'bar', 1);
     }
 
     public function testResolveTimeoutsForAllMachines()
     {
         $this->machine->expects($this->exactly(2))->method('resolveTimeouts')->with();
 
-        $facade = new Factory();
-        $facade->register('foo', function () { return $this->machine; });
-        $facade->register('bar', function () { return $this->machine; });
+        $factory = new Factory();
+        $factory->register('foo', function () { return $this->machine; });
+        $factory->register('bar', function () { return $this->machine; });
 
-        $facade->resolveTimeouts();
+        $factory->resolveTimeouts();
     }
 
     public function testResolveTimeoutsForSetMachines()
     {
         $this->machine->expects($this->once())->method('resolveTimeouts')->with();
 
-        $facade = new Factory();
-        $facade->register('foo', function () { return $this->machine; });
-        $facade->register('bar', function () { return $this->machine; });
+        $factory = new Factory();
+        $factory->register('foo', function () { return $this->machine; });
+        $factory->register('bar', function () { return $this->machine; });
 
-        $facade->resolveTimeouts(['foo']);
+        $factory->resolveTimeouts(['foo']);
     }
 }

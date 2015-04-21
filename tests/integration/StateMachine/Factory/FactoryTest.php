@@ -91,22 +91,22 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testTriggerEvent()
     {
-        $facade = new Factory();
-        $facade->register('testSchema', $this->definition);
+        $factory = new Factory();
+        $factory->register('testSchema', $this->definition);
 
-        $result = $facade->triggerEvent('testSchema', 'do', 1);
+        $result = $factory->triggerEvent('testSchema', 'do', 1);
 
         $this->assertEquals(['new', 'pending'], $result);
     }
 
     public function testResolveTimeoutsForAllMachines()
     {
-        $facade = new Factory();
-        $facade->register('testSchema', $this->definition);
-        $facade->triggerEvent('testSchema', 'do', 1);
+        $factory = new Factory();
+        $factory->register('testSchema', $this->definition);
+        $factory->triggerEvent('testSchema', 'do', 1);
 
         usleep(2000000); // 2s
-        $result = $facade->resolveTimeouts();
+        $result = $factory->resolveTimeouts();
 
         $this->assertEquals(['testSchema' => [1 => ['new', 'pending', 'done']]], $result);
     }
