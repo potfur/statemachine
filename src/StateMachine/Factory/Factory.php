@@ -9,18 +9,18 @@
 * file that was distributed with this source code.
 */
 
-namespace StateMachine\Facade;
+namespace StateMachine\Factory;
 
 
 use StateMachine\Exception\InvalidArgumentException;
 use StateMachine\StateMachine;
 
 /**
- * Facade class for easy handling of multiple state machines
+ * Factory class for easy handling of multiple state machines
  *
  * @package StateMachine
  */
-class Facade
+class Factory
 {
     /**
      * @var callable[]

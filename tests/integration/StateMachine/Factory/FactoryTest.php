@@ -9,7 +9,7 @@
 * file that was distributed with this source code.
 */
 
-namespace StateMachine\Facade;
+namespace StateMachine\Factory;
 
 
 use Fake\FakeLockHandler;
@@ -19,7 +19,7 @@ use StateMachine\Adapter\ArrayAdapter;
 use StateMachine\Process;
 use StateMachine\StateMachine;
 
-class FacadeTest extends \PHPUnit_Framework_TestCase
+class FactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var ArrayAdapter
@@ -91,7 +91,7 @@ class FacadeTest extends \PHPUnit_Framework_TestCase
 
     public function testTriggerEvent()
     {
-        $facade = new Facade();
+        $facade = new Factory();
         $facade->register('testSchema', $this->definition);
 
         $result = $facade->triggerEvent('testSchema', 'do', 1);
@@ -101,7 +101,7 @@ class FacadeTest extends \PHPUnit_Framework_TestCase
 
     public function testResolveTimeoutsForAllMachines()
     {
-        $facade = new Facade();
+        $facade = new Factory();
         $facade->register('testSchema', $this->definition);
         $facade->triggerEvent('testSchema', 'do', 1);
 

@@ -9,12 +9,12 @@
 * file that was distributed with this source code.
 */
 
-namespace StateMachine\Facade;
+namespace StateMachine\Factory;
 
 
 use StateMachine\StateMachine;
 
-class FacadeTest extends \PHPUnit_Framework_TestCase
+class FactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var StateMachine|\PHPUnit_Framework_MockObject_MockObject
@@ -28,7 +28,7 @@ class FacadeTest extends \PHPUnit_Framework_TestCase
 
     public function testRegister()
     {
-        $facade = new Facade();
+        $facade = new Factory();
 
         $this->assertFalse($facade->has('foo'));
 
@@ -39,7 +39,7 @@ class FacadeTest extends \PHPUnit_Framework_TestCase
 
     public function testGet()
     {
-        $facade = new Facade();
+        $facade = new Factory();
         $facade->register('foo', function () { return $this->machine; });
 
         $this->assertInstanceOf('\StateMachine\StateMachine', $facade->get('foo'));
@@ -51,14 +51,14 @@ class FacadeTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetUnregistered()
     {
-        $facade = new Facade();
+        $facade = new Factory();
         $facade->get('foo');
     }
 
     public function testTriggerEvent()
     {
         $this->machine->expects($this->once())->method('triggerEvent')->with('bar', 1);
-        $facade = new Facade();
+        $facade = new Factory();
         $facade->register('foo', function () { return $this->machine; });
         $facade->triggerEvent('foo', 'bar', 1);
     }
@@ -67,7 +67,7 @@ class FacadeTest extends \PHPUnit_Framework_TestCase
     {
         $this->machine->expects($this->exactly(2))->method('resolveTimeouts')->with();
 
-        $facade = new Facade();
+        $facade = new Factory();
         $facade->register('foo', function () { return $this->machine; });
         $facade->register('bar', function () { return $this->machine; });
 
@@ -78,7 +78,7 @@ class FacadeTest extends \PHPUnit_Framework_TestCase
     {
         $this->machine->expects($this->once())->method('resolveTimeouts')->with();
 
-        $facade = new Facade();
+        $facade = new Factory();
         $facade->register('foo', function () { return $this->machine; });
         $facade->register('bar', function () { return $this->machine; });
 
