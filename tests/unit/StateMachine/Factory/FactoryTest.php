@@ -84,4 +84,26 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory->resolveTimeouts(['foo']);
     }
+
+    /**
+     * @dataProvider schemaProvider
+     */
+    public function testResolveTimeoutsWithDifferentAttributeType($schema)
+    {
+        $this->machine->expects($this->exactly(1))->method('resolveTimeouts')->with();
+
+        $factory = new Factory();
+        $factory->register('foo', function () { return $this->machine; });
+
+        $factory->resolveTimeouts($schema);
+    }
+
+    public function schemaProvider()
+    {
+        return [
+            [[]],
+            ['foo'],
+            [['foo']]
+        ];
+    }
 }

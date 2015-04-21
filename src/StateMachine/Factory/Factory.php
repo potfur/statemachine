@@ -103,6 +103,8 @@ class Factory
      */
     public function resolveTimeouts($schemas = [])
     {
+        $schemas = (array) $schemas;
+
         if (empty($schemas)) {
             $schemas = array_keys($this->definitions);
         }
