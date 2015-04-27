@@ -28,7 +28,7 @@ Cons:
  - factory for different schemas - **done**
  - comments for states & events
  - more timeout formats: date, interval string, seconds
- - Renderer: onTimeOut must have its timeout displayed
- - Renderer: onStateWasSet & onTimeOut should be distinguished in style
+ - Renderer: onTimeOut must have its timeout displayed 
+ - Renderer: onStateWasSet & onTimeOut should be distinguished in style - **done**
  
 ![](https://github.com/potfur/statemachine/wiki/schema.png)
