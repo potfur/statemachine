@@ -22,62 +22,31 @@ use StateMachine\StateInterface;
  */
 class Renderer
 {
-    private $dpi;
-    private $font;
-    private $colors = [
-        'state' => ['text' => '#444444', 'color' => '#ebebeb', 'flag' => '#0066aa'],
-        'target' => ['text' => '#999999', 'color' => '#99BB11'],
-        'error' => ['text' => '#999999', 'color' => '#ee1155']
-    ];
-
     /**
      * @var AdapterInterface
      */
     private $adapter;
 
+    /**
+     * @var string
+     */
     private $executable;
+
+    /**
+     * @var Style
+     */
+    private $style;
 
     /**
      * @param AdapterInterface $adapter
      * @param string           $executable path to dot executable
-     * @param int              $dpi        resolution
-     * @param string           $font       font used for labels
-     * @param array            $colors     colors used for states and edges
+     * @param Style           $style
      */
-    public function __construct(AdapterInterface $adapter, $executable, $dpi = 75, $font = 'Courier', $colors = [])
+    public function __construct(AdapterInterface $adapter, $executable, Style $style)
     {
         $this->adapter = $adapter;
         $this->executable = $executable;
-
-        $this->dpi = (int) $dpi;
-        $this->font = $font;
-
-        $this->setColors($colors);
-    }
-
-    /**
-     * Set colors used for states and edges
-     * Passed array is merged with array just like that from getColors
-     *
-     * @param array $colors
-     */
-    public function setColors(array $colors)
-    {
-        foreach (array_keys($this->colors) as $node) {
-            if (isset($colors[$node])) {
-                $this->colors[$node] = array_merge($this->colors[$node], $colors[$node]);
-            }
-        }
-    }
-
-    /**
-     * Return array with colors used for states and edges
-     *
-     * @return array
-     */
-    public function getColors()
-    {
-        return $this->colors;
+        $this->style = $style;
     }
 
     /**
@@ -129,8 +98,8 @@ class Renderer
     {
         $document = new Document(
             $this->adapter->getProcess()->getName(),
-            $this->dpi,
-            $this->font
+            $this->style->getDPI(),
+            $this->style->getFont()
         );
 
         foreach ($this->adapter->getProcess()->getStates() as $state) {
@@ -154,13 +123,16 @@ class Renderer
      */
     private function addState(Document $document, StateInterface $state)
     {
+        $colors = $this->style->getStyle('state', $state->getName());
+
         $document->addState(
             new Node(
                 $state->getName(),
                 $state->getFlags(),
-                $this->colors['state']['color'],
-                $this->colors['state']['text'],
-                $this->colors['state']['flag']
+                $colors['color'],
+                $colors['text'],
+                $colors['style'],
+                $colors['altColor']
             )
         );
     }
@@ -175,11 +147,11 @@ class Renderer
     private function addEvent(Document $document, StateInterface $state, EventInterface $event)
     {
         if ($event->getTargetState()) {
-            $document->addEdge($this->createEdge($state, $event, $event->getTargetState(), $this->colors['target']));
+            $document->addEdge($this->createEdge($state, $event, $event->getTargetState(), $this->style->getStyle('target', $state->getName(), $event->getName())));
         }
 
         if ($event->getErrorState()) {
-            $document->addEdge($this->createEdge($state, $event, $event->getErrorState(), $this->colors['error']));
+            $document->addEdge($this->createEdge($state, $event, $event->getErrorState(), $this->style->getStyle('error', $state->getName(), $event->getName())));
         }
     }
 
@@ -189,18 +161,19 @@ class Renderer
      * @param StateInterface $state
      * @param EventInterface $event
      * @param string         $nextState
-     * @param array          $colors
+     * @param array          $style
      *
      * @return Edge
      */
-    private function createEdge(StateInterface $state, EventInterface $event, $nextState, $colors)
+    private function createEdge(StateInterface $state, EventInterface $event, $nextState, $style)
     {
         return new Edge(
             $state->getName(),
             $nextState,
             $event->getName(),
-            $colors['color'],
-            $colors['text']
+            $style['color'],
+            $style['text'],
+            $style['style']
         );
     }
 

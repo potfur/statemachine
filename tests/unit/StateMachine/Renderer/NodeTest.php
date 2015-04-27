@@ -21,7 +21,7 @@ class NodeTest extends \PHPUnit_Framework_TestCase
 
         $expected = 'node[label=<stateName<BR/><I><FONT POINT-SIZE="10" COLOR="#0066aa">foo: bar<BR/></FONT></I>>,height="0.6",shape="ellipse",style="filled",color="transparent",fillcolor="#ffffff",fontcolor="#000000"]{ state_stateName };';
 
-        $dot = new Node('stateName', [$flag], '#ffffff', '#000000', '#0066aa');
+        $dot = new Node('stateName', [$flag], '#ffffff', '#000000', 'ellipse', '#0066aa');
         $this->assertEquals($expected, (string) $dot);
     }
 
@@ -29,7 +29,7 @@ class NodeTest extends \PHPUnit_Framework_TestCase
     {
         $expected = 'node[label=<stateName>,height="0.6",shape="ellipse",style="filled",color="transparent",fillcolor="#ffffff",fontcolor="#000000"]{ state_stateName };';
 
-        $dot = new Node('stateName', [], '#ffffff', '#000000', '#0066aa');
+        $dot = new Node('stateName', [], '#ffffff', '#000000', 'ellipse', '#0066aa');
         $this->assertEquals($expected, (string) $dot);
     }
 }

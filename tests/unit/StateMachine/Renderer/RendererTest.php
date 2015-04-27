@@ -58,26 +58,6 @@ class RendererTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testColors()
-    {
-        $default = [
-            'state' => ['text' => '#444444', 'color' => '#ebebeb', 'flag' => '#0066aa'],
-            'target' => ['text' => '#999999', 'color' => '#99BB11'],
-            'error' => ['text' => '#999999', 'color' => '#ee1155']
-        ];
-
-        $renderer = new Renderer($this->adapter, '/usr/local/bin/dot');
-        $this->assertEquals($default, $renderer->getColors());
-
-        $modified = [
-            'state' => ['text' => '#444444', 'color' => '#ebebeb', 'flag' => '#0066aa'],
-            'target' => ['text' => '#999999', 'color' => '#99BB11'],
-            'error' => ['text' => '#999999', 'color' => '#ee1155']
-        ];
-        $renderer->setColors($modified);
-        $this->assertEquals($modified, $renderer->getColors());
-    }
-
     public function testDotFormat()
     {
         $this->state->expects($this->any())->method('getName')->willReturn('name');
@@ -86,7 +66,7 @@ class RendererTest extends \PHPUnit_Framework_TestCase
 
         $this->process->expects($this->any())->method('getName')->willReturn('processName');
 
-        $renderer = new Renderer($this->adapter, '/usr/local/bin/dot');
+        $renderer = new Renderer($this->adapter, '/usr/local/bin/dot', new Style());
         $renderer->dot('./foo.dot');
 
         $this->assertFileExists('./foo.dot');
@@ -108,7 +88,7 @@ class RendererTest extends \PHPUnit_Framework_TestCase
 
         $this->process->expects($this->any())->method('getName')->willReturn('processName');
 
-        $renderer = new Renderer($this->adapter, '/usr/local/bin/dot');
+        $renderer = new Renderer($this->adapter, '/usr/local/bin/dot', new Style());
         $renderer->dot('./foo.dot');
 
         $this->assertFileExists('./foo.dot');
@@ -125,7 +105,7 @@ class RendererTest extends \PHPUnit_Framework_TestCase
 
         $this->process->expects($this->any())->method('getName')->willReturn('processName');
 
-        $renderer = new Renderer($this->adapter, '/usr/local/bin/dot');
+        $renderer = new Renderer($this->adapter, '/usr/local/bin/dot', new Style());
         $renderer->png('./foo.png');
 
         $this->expectOutputString('/usr/local/bin/dot -Tpng ./smrtmp -o./foo.png');
@@ -139,7 +119,7 @@ class RendererTest extends \PHPUnit_Framework_TestCase
 
         $this->process->expects($this->any())->method('getName')->willReturn('processName');
 
-        $renderer = new Renderer($this->adapter, '/usr/local/bin/dot');
+        $renderer = new Renderer($this->adapter, '/usr/local/bin/dot', new Style());
         $renderer->svg('./foo.svg');
 
         $this->expectOutputString('/usr/local/bin/dot -Tsvg ./smrtmp -o./foo.svg');

@@ -23,6 +23,7 @@ final class Edge implements DotInterface
     private $event;
     private $fillColor;
     private $textColor;
+    private $edgeStyle;
 
     /**
      * Build edge/path between two nodes in dot format
@@ -32,14 +33,16 @@ final class Edge implements DotInterface
      * @param string $event
      * @param string $fillColor
      * @param string $textColor
+     * @param string $edgeStyle
      */
-    public function __construct($fromState, $toState, $event, $fillColor, $textColor)
+    public function __construct($fromState, $toState, $event, $fillColor, $textColor, $edgeStyle)
     {
         $this->fromState = $fromState;
         $this->toState = $toState;
         $this->event = $event;
         $this->fillColor = $fillColor;
         $this->textColor = $textColor;
+        $this->edgeStyle = $edgeStyle;
     }
 
     /**
@@ -50,12 +53,13 @@ final class Edge implements DotInterface
     public function __toString()
     {
         return sprintf(
-            'edge[dir="forward",style="solid",color="%4$s",fontcolor="%5$s"] state_%1$s -> state_%2$s [label=" %3$s"];',
+            'edge[dir="forward",style="%6$s",color="%4$s",fontcolor="%5$s"] state_%1$s -> state_%2$s [label=" %3$s"];',
             $this->fromState,
             $this->toState,
             $this->event,
             $this->fillColor,
-            $this->textColor
+            $this->textColor,
+            $this->edgeStyle
         );
     }
 }

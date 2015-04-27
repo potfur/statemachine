@@ -24,6 +24,7 @@ class Node implements DotInterface
     private $flags;
     private $fillColor;
     private $textColor;
+    private $shape;
     private $flagColor;
 
     /**
@@ -33,14 +34,16 @@ class Node implements DotInterface
      * @param Flag[] $flags
      * @param string $fillColor
      * @param string $textColor
+     * @param string $shape
      * @param string $flagColor
      */
-    public function __construct($state, array $flags, $fillColor, $textColor, $flagColor)
+    public function __construct($state, array $flags, $fillColor = '#ebebeb', $textColor = '#444444', $shape = 'ellipse', $flagColor = '#0066aa')
     {
         $this->state = $state;
         $this->flags = $flags;
         $this->fillColor = $fillColor;
         $this->textColor = $textColor;
+        $this->shape = $shape;
         $this->flagColor = $flagColor;
     }
 
@@ -52,11 +55,12 @@ class Node implements DotInterface
     public function __toString()
     {
         return sprintf(
-            'node[label=<%1$s%2$s>,height="0.6",shape="ellipse",style="filled",color="transparent",fillcolor="%3$s",fontcolor="%4$s"]{ state_%1$s };',
+            'node[label=<%1$s%2$s>,height="0.6",shape="%5$s",style="filled",color="transparent",fillcolor="%3$s",fontcolor="%4$s"]{ state_%1$s };',
             $this->state,
             $this->buildFlags($this->flags, $this->flagColor),
             $this->fillColor,
-            $this->textColor
+            $this->textColor,
+            $this->shape
         );
     }
 
