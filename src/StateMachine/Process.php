@@ -19,29 +19,37 @@ final class Process implements ProcessInterface
     const ON_TIME_OUT = 'onTimeOut';
 
     /**
+     * Process/schema name
+     *
      * @var string
      */
     private $name;
 
     /**
+     * Context class
+     *
      * @var string
      */
     private $subjectClass;
 
     /**
+     * Initial state
+     *
      * @var string
      */
     private $initialState;
 
     /**
+     * Schema states
+     *
      * @var GenericCollection|StateInterface[]
      */
     private $states = [];
 
     /**
-     * @param string           $name
-     * @param string           $subjectClass
-     * @param string           $initialState
+     * @param string           $name         process/schema name
+     * @param string           $subjectClass context class name
+     * @param string           $initialState initial state for entities starting process
      * @param StateInterface[] $states
      *
      * @throws InvalidStateException

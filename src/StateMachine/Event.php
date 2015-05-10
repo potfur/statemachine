@@ -56,6 +56,13 @@ final class Event implements EventInterface
     private $timeout;
 
     /**
+     * Additional comment
+     *
+     * @var string
+     */
+    private $comment;
+
+    /**
      * Constructor
      *
      * @param string                       $name        event name
@@ -63,8 +70,9 @@ final class Event implements EventInterface
      * @param string                       $errorState  state where subject will go when command execution failed
      * @param CommandCollection            $commands    collection of commands
      * @param null|\DateInterval|\DateTime $timeout     date or interval when event should timeout
+     * @param string                       $comment     additional comment
      */
-    public function __construct($name, $targetState = null, $errorState = null, CommandCollection $commands = null, $timeout = null)
+    public function __construct($name, $targetState = null, $errorState = null, CommandCollection $commands = null, $timeout = null, $comment = null)
     {
         $this->assertName($name);
         $this->assertTimeout($timeout);
@@ -74,6 +82,7 @@ final class Event implements EventInterface
         $this->errorState = $errorState;
         $this->commands = $commands;
         $this->timeout = $timeout;
+        $this->comment = $comment;
     }
 
     /**
@@ -134,6 +143,16 @@ final class Event implements EventInterface
     public function getErrorState()
     {
         return $this->errorState;
+    }
+
+    /**
+     * Return comment
+     *
+     * @return string
+     */
+    public function getComment()
+    {
+        return $this->comment;
     }
 
     /**

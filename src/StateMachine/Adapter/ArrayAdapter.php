@@ -26,7 +26,18 @@ use StateMachine\State;
  */
 class ArrayAdapter implements AdapterInterface
 {
+    /**
+     * Schema array
+     *
+     * @var array
+     */
     private $schema;
+
+    /**
+     * Resolved process instance
+     *
+     * @var Process
+     */
     private $process;
 
     /**
@@ -81,7 +92,8 @@ class ArrayAdapter implements AdapterInterface
             $states[] = new State(
                 $this->getOffsetFromArray($state, 'name'),
                 $this->buildEvents($state),
-                $this->buildFlags($state)
+                $this->buildFlags($state),
+                $this->getOffsetFromArray($state, 'comment')
             );
         }
 
@@ -121,7 +133,8 @@ class ArrayAdapter implements AdapterInterface
                 $this->getOffsetFromArray($event, 'targetState'),
                 $this->getOffsetFromArray($event, 'errorState'),
                 $this->buildCommands($event),
-                $this->getOffsetFromArray($event, 'timeout')
+                $this->getOffsetFromArray($event, 'timeout'),
+                $this->getOffsetFromArray($event, 'comment')
             );
         }
 

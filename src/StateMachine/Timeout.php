@@ -20,18 +20,41 @@ use StateMachine\Exception\InvalidArgumentException;
  */
 class Timeout
 {
+    /**
+     * State name where timeout occurred
+     *
+     * @var string
+     */
     private $state;
+
+    /**
+     * Event name, usually onTimeOut
+     *
+     * @var string
+     */
     private $event;
+
+    /**
+     * Context identifier
+     *
+     * @var mixed
+     */
     private $identifier;
+
+    /**
+     * Date when timeout should be executed
+     *
+     * @var \DateTime
+     */
     private $execution;
 
     /**
      * Constructor
      *
-     * @param string    $state
-     * @param string    $event
-     * @param mixed     $identifier
-     * @param \DateTime $execution
+     * @param string    $state      state name
+     * @param string    $event      event name
+     * @param mixed     $identifier context identifier
+     * @param \DateTime $execution  execution date
      *
      * @throws InvalidArgumentException
      */

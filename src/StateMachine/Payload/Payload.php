@@ -21,29 +21,44 @@ use StateMachine\PayloadInterface;
  */
 final class Payload implements PayloadInterface
 {
+    /**
+     * Flag if context changed
+     *
+     * @var bool
+     */
     private $hasChanged = false;
 
     /**
+     * Current contexts state
+     *
      * @var string
      */
     private $state;
 
     /**
+     * Contexts flags
+     *
      * @var Flag[]
      */
     private $flags = [];
 
     /**
+     * Current runs history
+     *
      * @var array
      */
     private $history = [];
 
     /**
+     * Context identifier
+     *
      * @var mixed
      */
     private $identifier;
 
     /**
+     * Actual context instance
+     *
      * @var mixed|StateAwareInterface|FlagAwareInterface
      */
     private $subject;

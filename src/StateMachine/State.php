@@ -12,32 +12,47 @@ use StateMachine\Exception\InvalidArgumentException;
 final class State implements StateInterface
 {
     /**
+     * State name
+     *
      * @var string
      */
     private $name;
 
     /**
-     * @var GenericCollection|EventInterface[]
+     * State events
+     *
+     * @var EventInterface[]
      */
     private $events;
 
     /**
-     * @var GenericCollection|Flag[]
+     * State flags
+     *
+     * @var Flag[]
      */
     private $flags;
 
     /**
-     * @param string  $name
-     * @param EventInterface[] $events
-     * @param Flag[]  $flags
+     * Additional comment
+     *
+     * @var string
      */
-    public function __construct($name, array $events = [], array $flags = [])
+    private $comment;
+
+    /**
+     * @param string           $name state name
+     * @param EventInterface[] $events list of events in state
+     * @param Flag[]           $flags array with state flags
+     * @param string           $comment optional comment
+     */
+    public function __construct($name, array $events = [], array $flags = [], $comment = null)
     {
         $this->assertName($name);
 
         $this->name = $name;
         $this->events = new GenericCollection($events, '\StateMachine\EventInterface');
         $this->flags = new GenericCollection($flags, '\StateMachine\Flag');
+        $this->comment = $comment;
     }
 
     /**
@@ -130,6 +145,16 @@ final class State implements StateInterface
     public function getEvent($name)
     {
         return $this->events->get($name);
+    }
+
+    /**
+     * Return comment
+     *
+     * @return string
+     */
+    public function getComment()
+    {
+        return $this->comment;
     }
 
     /**

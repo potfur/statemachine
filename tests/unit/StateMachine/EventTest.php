@@ -55,6 +55,12 @@ class EventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('errorState', $event->getErrorState());
     }
 
+    public function testComment()
+    {
+        $event = new Event('eventName', null, 'errorState', null, null, 'Lorem ipsum');
+        $this->assertEquals('Lorem ipsum', $event->getComment());
+    }
+
     /**
      * @dataProvider timeoutProvider
      */

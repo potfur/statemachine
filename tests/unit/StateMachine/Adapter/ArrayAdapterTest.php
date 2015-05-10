@@ -55,12 +55,14 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
             'states' => [
                 [
                     'name' => 'testState',
+                    'comment' => 'comment',
                     'flags' => [
                         'hasFlag' => true
                     ],
                     'events' => [
                         [
                             'name' => 'eventName',
+                            'comment' => 'comment',
                             'targetState' => 'pending',
                             'errorState' => 'error',
                             'commands' => [
@@ -84,10 +86,15 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
                             'eventName',
                             'pending',
                             'error',
-                            new CommandCollection([$command])
+                            new CommandCollection([$command]),
+                            null,
+                            'comment'
                         )
                     ],
-                    [new Flag('hasFlag', true)]
+                    [
+                        new Flag('hasFlag', true)
+                    ],
+                    'comment'
                 )
             ]
         );

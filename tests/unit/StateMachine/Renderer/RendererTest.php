@@ -72,7 +72,7 @@ class RendererTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists('./foo.dot');
 
         // reversed, expected is actual
-        $this->assertStringEqualsFile('./foo.dot', 'digraph processName {dpi="75";pad="1";fontname="Courier";nodesep="1";rankdir="TD";ranksep="0.5";node[label=<name>,height="0.6",shape="ellipse",style="filled",color="transparent",fillcolor="#ebebeb",fontcolor="#444444"]{ state_name };}');
+        $this->assertStringEqualsFile('./foo.dot', 'digraph processName {dpi="75";pad="1";fontname="Courier";nodesep="1";rankdir="TD";ranksep="0.5";node[label=<name>,tooltip="",height="0.6",shape="ellipse",style="filled",color="transparent",fillcolor="#ebebeb",fontcolor="#444444"]{ state_name };}');
     }
 
     public function testDotFormatWithEvent()
@@ -94,7 +94,7 @@ class RendererTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists('./foo.dot');
 
         // reversed, expected is actual
-        $this->assertStringEqualsFile('./foo.dot', 'digraph processName {dpi="75";pad="1";fontname="Courier";nodesep="1";rankdir="TD";ranksep="0.5";node[label=<name>,height="0.6",shape="ellipse",style="filled",color="transparent",fillcolor="#ebebeb",fontcolor="#444444"]{ state_name };edge[dir="forward",style="solid",color="#99BB11",fontcolor="#999999"] state_name -> state_targetState [label=" eventName"];edge[dir="forward",style="solid",color="#ee1155",fontcolor="#999999"] state_name -> state_errorState [label=" eventName"];}');
+        $this->assertStringEqualsFile('./foo.dot', 'digraph processName {dpi="75";pad="1";fontname="Courier";nodesep="1";rankdir="TD";ranksep="0.5";node[label=<name>,tooltip="",height="0.6",shape="ellipse",style="filled",color="transparent",fillcolor="#ebebeb",fontcolor="#444444"]{ state_name };edge[label=" eventName",tooltip="",dir="forward",style="solid",color="#99BB11",fontcolor="#999999"] state_name -> state_targetState;edge[label=" eventName",tooltip="",dir="forward",style="solid",color="#ee1155",fontcolor="#999999"] state_name -> state_errorState;}');
     }
 
     public function testPNG()

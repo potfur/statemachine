@@ -67,6 +67,13 @@ interface StateInterface
     public function getEvent($name);
 
     /**
+     * Return comment
+     *
+     * @return string
+     */
+    public function getComment();
+
+    /**
      * Triggers event with given name and payload
      * Returns name of next state or null if no change
      *

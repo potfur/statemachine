@@ -23,11 +23,15 @@ use StateMachine\StateMachine;
 class Factory
 {
     /**
+     * Definitions for building state machines
+     *
      * @var callable[]
      */
     private $definitions = [];
 
     /**
+     * Resolved state machine instances
+     *
      * @var StateMachine[]
      */
     private $instances = [];

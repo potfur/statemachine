@@ -18,26 +18,47 @@ namespace StateMachine\Renderer;
  */
 final class Document implements DotInterface
 {
+    /**
+     * Document name
+     *
+     * @var string
+     */
     private $name;
+
+    /**
+     * Document density
+     *
+     * @var int
+     */
     private $dpi;
+
+    /**
+     * Font style
+     *
+     * @var string
+     */
     private $font;
 
     /**
+     * List of states
+     *
      * @var DotInterface[]
      */
     private $states = [];
 
     /**
+     * List of edges
+     *
      * @var DotInterface[]
      */
-    private $paths = [];
+    private $edges = [];
 
     /**
      * Constructor
      *
-     * @param string $name
-     * @param int    $dpi
-     * @param string $font
+     * @param string $name document name
+     * @param int    $dpi  density
+     * @param string $font font family
      */
     public function __construct($name, $dpi = 75, $font = 'Courier')
     {
@@ -63,7 +84,7 @@ final class Document implements DotInterface
      */
     public function addEdge(DotInterface $path)
     {
-        $this->paths[] = $path;
+        $this->edges[] = $path;
     }
 
     /**
@@ -79,7 +100,7 @@ final class Document implements DotInterface
             $this->dpi,
             $this->font,
             implode($this->states),
-            implode($this->paths)
+            implode($this->edges)
         );
     }
 }

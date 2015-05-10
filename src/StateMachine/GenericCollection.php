@@ -22,7 +22,18 @@ use StateMachine\Exception\OutOfRangeException;
  */
 final class GenericCollection implements \Countable
 {
+    /**
+     * Collection elements
+     *
+     * @var array
+     */
     private $collection = array();
+
+    /**
+     * Interface/class that limits collection elements
+     *
+     * @var null|string
+     */
     private $instanceOf;
 
     /**

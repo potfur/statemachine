@@ -18,31 +18,75 @@ namespace StateMachine\Renderer;
  */
 final class Edge implements DotInterface
 {
+    /**
+     * Source state name
+     *
+     * @var string
+     */
     private $fromState;
+
+    /**
+     * Target state name
+     *
+     * @var string
+     */
     private $toState;
+
+    /**
+     * Event name
+     *
+     * @var string
+     */
     private $event;
-    private $fillColor;
-    private $textColor;
+
+    /**
+     * Description
+     *
+     * @var string
+     */
+    private $comment;
+
+    /**
+     * Edge/line color
+     *
+     * @var string
+     */
+    private $edgeColor;
+
+    /**
+     * Edge/line color
+     *
+     * @var string
+     */
     private $edgeStyle;
+
+    /**
+     * Label color
+     *
+     * @var string
+     */
+    private $textColor;
 
     /**
      * Build edge/path between two nodes in dot format
      *
-     * @param string $fromState
-     * @param string $toState
-     * @param string $event
-     * @param string $fillColor
-     * @param string $textColor
-     * @param string $edgeStyle
+     * @param string $fromState source state
+     * @param string $toState   target state
+     * @param string $event     event name
+     * @param string $comment   description
+     * @param string $edgeColor color for edge/line
+     * @param string $textColor label color
+     * @param string $edgeStyle edge/line style
      */
-    public function __construct($fromState, $toState, $event, $fillColor, $textColor, $edgeStyle)
+    public function __construct($fromState, $toState, $event, $comment = null, $edgeColor, $edgeStyle, $textColor)
     {
         $this->fromState = $fromState;
         $this->toState = $toState;
         $this->event = $event;
-        $this->fillColor = $fillColor;
-        $this->textColor = $textColor;
+        $this->comment = $comment;
+        $this->edgeColor = $edgeColor;
         $this->edgeStyle = $edgeStyle;
+        $this->textColor = $textColor;
     }
 
     /**
@@ -53,13 +97,14 @@ final class Edge implements DotInterface
     public function __toString()
     {
         return sprintf(
-            'edge[dir="forward",style="%6$s",color="%4$s",fontcolor="%5$s"] state_%1$s -> state_%2$s [label=" %3$s"];',
+            'edge[label=" %3$s",tooltip="%7$s",dir="forward",style="%6$s",color="%4$s",fontcolor="%5$s"] state_%1$s -> state_%2$s;',
             $this->fromState,
             $this->toState,
             $this->event,
-            $this->fillColor,
+            $this->edgeColor,
             $this->textColor,
-            $this->edgeStyle
+            $this->edgeStyle,
+            $this->comment
         );
     }
 }

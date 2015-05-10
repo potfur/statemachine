@@ -23,15 +23,37 @@ final class Style
     const GLUE = '.';
     const WILDCARD = '*';
 
+    /**
+     * Output density
+     *
+     * @var int
+     */
     private $dpi;
+
+    /**
+     * Font name that should be used for rendering
+     * Depends on graphviz lib
+     *
+     * @var string
+     */
     private $font;
 
+    /**
+     * Default styles
+     *
+     * @var array
+     */
     private $defaultStyles = [
         'state' => ['text' => '#444444', 'color' => '#ebebeb', 'style' => 'ellipse', 'altColor' => '#0066aa'],
         'target' => ['text' => '#999999', 'color' => '#99BB11', 'style' => 'solid'],
         'error' => ['text' => '#999999', 'color' => '#ee1155', 'style' => 'solid']
     ];
 
+    /**
+     * Custom styles
+     *
+     * @var array
+     */
     private $customStyles = [
         '*.onStateWasSet' => ['style' => 'bold'],
         '*.onTimeOut' => ['style' => 'dashed'],
@@ -40,9 +62,9 @@ final class Style
     /**
      * Constructor
      *
-     * @param int    $dpi
-     * @param string $font
-     * @param array  $styles
+     * @param int    $dpi    render density
+     * @param string $font   font family used for text
+     * @param array  $styles array containing custom styles
      */
     public function __construct($dpi = 75, $font = 'Courier', array $styles = [])
     {
@@ -75,21 +97,17 @@ final class Style
     /**
      * Set styles used for states and edges by their name
      * States are named by their name, edges/events by state.name
-     *
      * Wildcards are supported
      *     *.onTimeOut - all onTimeOut events will have such style
      *     New.*       - all events in new will have such style
-     *
      * Each element of passed must contain at least key:
      *     text     - color used for elements label,
      *     color    - primary color used in element,
      *     altColor - alternative color for additional info
      *     style    - shape/border/edge style
-     *
      * Styles are merged with default value
      *
-     *
-     *@param array $styles
+     * @param array $styles
      */
     public function setStyles(array $styles)
     {

@@ -11,8 +11,6 @@
 
 namespace StateMachine;
 
-use StateMachine\Exception\InvalidArgumentException;
-
 /**
  * Interface for events
  *
@@ -42,6 +40,13 @@ interface EventInterface
      * @return string
      */
     public function getErrorState();
+
+    /**
+     * Return comment
+     *
+     * @return string
+     */
+    public function getComment();
 
     /**
      * Return true if event has timeout

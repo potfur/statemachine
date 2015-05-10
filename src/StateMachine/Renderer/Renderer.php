@@ -23,24 +23,30 @@ use StateMachine\StateInterface;
 class Renderer
 {
     /**
+     * Process/schema adapter
+     *
      * @var AdapterInterface
      */
     private $adapter;
 
     /**
+     * Path to graphviz executable
+     *
      * @var string
      */
     private $executable;
 
     /**
+     * Style collection
+     *
      * @var Style
      */
     private $style;
 
     /**
-     * @param AdapterInterface $adapter
+     * @param AdapterInterface $adapter    process/schema adapter
      * @param string           $executable path to dot executable
-     * @param Style           $style
+     * @param Style            $style      style collection
      */
     public function __construct(AdapterInterface $adapter, $executable, Style $style)
     {
@@ -129,6 +135,7 @@ class Renderer
             new Node(
                 $state->getName(),
                 $state->getFlags(),
+                $state->getComment(),
                 $colors['color'],
                 $colors['text'],
                 $colors['style'],
@@ -171,9 +178,10 @@ class Renderer
             $state->getName(),
             $nextState,
             $event->getName(),
+            $event->getComment(),
             $style['color'],
-            $style['text'],
-            $style['style']
+            $style['style'],
+            $style['text']
         );
     }
 
