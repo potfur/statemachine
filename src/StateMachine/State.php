@@ -21,14 +21,14 @@ final class State implements StateInterface
     /**
      * State events
      *
-     * @var EventInterface[]
+     * @var GenericCollection
      */
     private $events;
 
     /**
      * State flags
      *
-     * @var Flag[]
+     * @var GenericCollection
      */
     private $flags;
 
