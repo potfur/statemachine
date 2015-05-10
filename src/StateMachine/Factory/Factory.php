@@ -11,7 +11,6 @@
 
 namespace StateMachine\Factory;
 
-
 use StateMachine\Exception\InvalidArgumentException;
 use StateMachine\StateMachine;
 
