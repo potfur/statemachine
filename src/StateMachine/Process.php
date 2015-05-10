@@ -16,7 +16,7 @@ final class Process implements ProcessInterface
     use GetTypeTrait;
 
     const ON_STATE_WAS_SET = 'onStateWasSet';
-    const ON_TIME_OUT = 'onTimeOut';
+    const ON_TIME_OUT = 'onTimeout';
 
     /**
      * Process/schema name

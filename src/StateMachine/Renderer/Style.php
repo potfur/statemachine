@@ -56,7 +56,7 @@ final class Style
      */
     private $customStyles = [
         '*.onStateWasSet' => ['style' => 'bold'],
-        '*.onTimeOut' => ['style' => 'dashed'],
+        '*.onTimeout' => ['style' => 'dashed'],
     ];
 
     /**
@@ -98,7 +98,7 @@ final class Style
      * Set styles used for states and edges by their name
      * States are named by their name, edges/events by state.name
      * Wildcards are supported
-     *     *.onTimeOut - all onTimeOut events will have such style
+     *     *.onTimeout - all onTimeout events will have such style
      *     New.*       - all events in new will have such style
      * Each element of passed must contain at least key:
      *     text     - color used for elements label,

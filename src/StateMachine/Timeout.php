@@ -28,7 +28,7 @@ class Timeout
     private $state;
 
     /**
-     * Event name, usually onTimeOut
+     * Event name, usually onTimeout
      *
      * @var string
      */
