@@ -54,7 +54,7 @@ class StyleTest extends \PHPUnit_Framework_TestCase
 
         $expected =[
             '*.onStateWasSet' => ['style' => 'bold'],
-            '*.onTimeOut' => ['style' => 'dashed'],
+            '*.onTimeout' => ['style' => 'dashed'],
             'state.event' => ['text' => '#000000', 'color' => '#444444', 'style' => 'solid']
         ];
 

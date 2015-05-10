@@ -166,13 +166,23 @@ final class Event implements EventInterface
     }
 
     /**
+     * Return timeout value
+     *
+     * @return null|\DateTime|\DateInterval
+     */
+    public function getTimeout()
+    {
+        return $this->timeout;
+    }
+
+    /**
      * Return when event timeout
      *
      * @param \DateTime $now date will be used as reference for timeouts defined as intervals
      *
      * @return \DateTime
      */
-    public function getTimeout(\DateTime $now)
+    public function timeoutAt(\DateTime $now)
     {
         if ($this->timeout instanceof \DateTime) {
             return $this->timeout;

@@ -56,13 +56,20 @@ interface EventInterface
     public function hasTimeout();
 
     /**
-     * Return when event timeout
+     * Return timeout value
+     *
+     * @return null|\DateTime|\DateInterval
+     */
+    public function getTimeout();
+
+    /**
+     * Return date when event timeout
      *
      * @param \DateTime $now date will be used as reference for timeouts defined as intervals
      *
      * @return \DateTime
      */
-    public function getTimeout(\DateTime $now);
+    public function timeoutAt(\DateTime $now);
 
     /**
      * Triggers event and return next state name or null if there is no state change

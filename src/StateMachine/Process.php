@@ -247,6 +247,6 @@ final class Process implements ProcessInterface
         $state = $this->getState($payload->getState());
         $event = $state->getEvent(self::ON_TIME_OUT);
 
-        return new Timeout($state->getName(), self::ON_TIME_OUT, $payload->getIdentifier(), $event->getTimeout($now));
+        return new Timeout($state->getName(), self::ON_TIME_OUT, $payload->getIdentifier(), $event->timeoutAt($now));
     }
 }

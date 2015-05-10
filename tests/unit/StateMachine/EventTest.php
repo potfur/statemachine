@@ -73,12 +73,21 @@ class EventTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider timeoutProvider
      */
-    public function testGetTimeout($timeout, $expected)
+    public function testGetTimeout($timeout)
+    {
+        $event = new Event('eventName', null, null, null, $timeout);
+        $this->assertEquals($timeout, $event->getTimeout());
+    }
+
+    /**
+     * @dataProvider timeoutProvider
+     */
+    public function testTimeoutAt($timeout, $expected)
     {
         $now = new \DateTime('2015-03-31 10:10:10');
 
         $event = new Event('eventName', null, null, null, $timeout);
-        $this->assertEquals($expected, $event->getTimeout($now));
+        $this->assertEquals($expected, $event->timeoutAt($now));
     }
 
     public function timeoutProvider()
