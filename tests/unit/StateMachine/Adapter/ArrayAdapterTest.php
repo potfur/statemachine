@@ -20,11 +20,21 @@ use StateMachine\State;
 
 class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var \StateMachine\TimeoutConverterInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $converter;
+
+    public function setUp()
+    {
+        $this->converter = $this->getMock('\StateMachine\TimeoutConverterInterface');
+    }
+
     public function testGetSchemaName()
     {
         $schema = ['name' => 'schemaName'];
 
-        $adapter = new ArrayAdapter($schema);
+        $adapter = new ArrayAdapter($schema, $this->converter);
         $this->assertEquals('schemaName', $adapter->getSchemaName());
     }
 
@@ -32,7 +42,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
     {
         $schema = ['subjectClass' => '\stdClass'];
 
-        $adapter = new ArrayAdapter($schema);
+        $adapter = new ArrayAdapter($schema, $this->converter);
         $this->assertEquals('\stdClass', $adapter->getSubjectClass());
     }
 
@@ -40,13 +50,15 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
     {
         $schema = ['initialState' => 'new'];
 
-        $adapter = new ArrayAdapter($schema);
+        $adapter = new ArrayAdapter($schema, $this->converter);
         $this->assertEquals('new', $adapter->getInitialState());
     }
 
     public function testGetProcess()
     {
-        $command = function () { };
+        $command = function () {
+            // NOP
+        };
 
         $schema = [
             'name' => 'testSchema',
@@ -61,13 +73,20 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
                     ],
                     'events' => [
                         [
-                            'name' => 'eventName',
+                            'name' => 'eventA',
                             'comment' => 'comment',
                             'targetState' => 'pending',
                             'errorState' => 'error',
                             'commands' => [
                                 $command
                             ]
+                        ],
+                        [
+                            'name' => 'eventB',
+                            'comment' => 'comment',
+                            'targetState' => 'pending',
+                            'errorState' => 'error',
+                            'timeout' => new \DateInterval('PT10S'),
                         ]
                     ],
                 ]
@@ -83,11 +102,19 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
                     'testState',
                     [
                         new Event(
-                            'eventName',
+                            'eventA',
                             'pending',
                             'error',
                             new CommandCollection([$command]),
                             null,
+                            'comment'
+                        ),
+                        new Event(
+                            'eventB',
+                            'pending',
+                            'error',
+                            new CommandCollection(),
+                            new \DateInterval('PT10S'),
                             'comment'
                         )
                     ],
@@ -99,7 +126,9 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $adapter = new ArrayAdapter($schema);
+        $this->converter->expects($this->any())->method('convert')->willReturnArgument(0);
+
+        $adapter = new ArrayAdapter($schema, $this->converter);
         $this->assertEquals($expected, $adapter->getProcess());
     }
 }
