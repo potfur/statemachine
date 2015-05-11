@@ -162,7 +162,7 @@ class ArrayAdapter implements AdapterInterface
             return null;
         }
 
-        return $timeout = $this->converter->convert($timeout);
+        return $this->converter->convert($timeout);
     }
 
     /**
