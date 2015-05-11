@@ -54,6 +54,13 @@ final class Edge implements DotInterface
     private $style;
 
     /**
+     * Timeout
+     *
+     * @var \DateInterval|\DateTime|null
+     */
+    private $timeout;
+
+    /**
      * Build edge/path between two nodes in dot format
      *
      * @param string                  $fromState source state
