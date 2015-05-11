@@ -16,9 +16,15 @@ use Fake\FakeLockHandler;
 use Fake\FakePayloadHandler;
 use Fake\FakeTimeoutHandler;
 use StateMachine\Adapter\ArrayAdapter;
+use StateMachine\Adapter\TimeoutConverter;
 
 class StateMachineTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var TimeoutConverter
+     */
+    private $converter;
+
     /**
      * @var ArrayAdapter
      */
@@ -115,7 +121,8 @@ class StateMachineTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $this->adapter = new ArrayAdapter($schema);
+        $this->converter = new TimeoutConverter();
+        $this->adapter = new ArrayAdapter($schema, $this->converter);
         $this->payloadHandler = new FakePayloadHandler();
         $this->timeoutHandler = new FakeTimeoutHandler();
         $this->lockHandler = new FakeLockHandler();
