@@ -42,6 +42,13 @@ interface EventInterface
     public function getErrorState();
 
     /**
+     * Return list of transition types with target states
+     *
+     * @return array
+     */
+    public function getStates();
+
+    /**
      * Return comment
      *
      * @return string

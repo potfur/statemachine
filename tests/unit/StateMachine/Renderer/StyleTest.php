@@ -14,90 +14,27 @@ namespace StateMachine\Renderer;
 
 class StyleTest extends \PHPUnit_Framework_TestCase
 {
-    public function testDPI()
+    public function testText()
     {
-        $style = new Style(100);
-        $this->assertEquals(100, $style->getDPI());
+        $style = new Style('#444444', '#99BB11', 'ellipse', '#0066aa');
+        $this->assertEquals('#444444', $style->getText());
     }
 
-    public function testFont()
+    public function testColor()
     {
-        $style = new Style(75, 'Arial');
-        $this->assertEquals('Arial', $style->getFont());
+        $style = new Style('#444444', '#99BB11', 'ellipse', '#0066aa');
+        $this->assertEquals('#99BB11', $style->getColor());
     }
 
-    /**
-     * @expectedException \StateMachine\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid color provided, must be valid 6 character HTML color code.
-     *
-     * @dataProvider colorKeyProvider
-     */
-    public function testInvalidColorFormat($key)
+    public function testAltColor()
     {
-        $style = new Style();
-        $style->setStyles(['foo.bar' => [$key => 'foobar']]);
+        $style = new Style('#444444', '#99BB11', 'ellipse', '#0066aa');
+        $this->assertEquals('#0066aa', $style->getAltColor());
     }
 
-    public function colorKeyProvider()
+    public function testStyle()
     {
-        return [
-            ['text'],
-            ['color'],
-            ['altColor']
-        ];
-    }
-
-    public function testStyles()
-    {
-        $style = new Style(75, 'Courier', []);
-        $style->setStyles(['state.event' => ['text' => '#000000', 'color' => '#444444', 'style' => 'solid']]);
-
-        $expected =[
-            '*.onStateWasSet' => ['style' => 'bold'],
-            '*.onTimeout' => ['style' => 'dashed'],
-            'state.event' => ['text' => '#000000', 'color' => '#444444', 'style' => 'solid']
-        ];
-
-        $this->assertEquals($expected, $style->getStyles());
-    }
-
-    public function testGetStateEventStyle()
-    {
-        $colorSet = ['text' => '#000000', 'color' => '#444444', 'style' => 'solid', 'altColor' => '#999999'];
-
-        $style = new Style(75, 'Courier', []);
-        $style->setStyles(['stateName.eventName' => $colorSet]);
-
-        $this->assertEquals($colorSet, $style->getStyle('state', 'stateName', 'eventName'));
-    }
-
-    public function testGetWildcardStateStyle()
-    {
-        $colorSet = ['text' => '#000000', 'color' => '#444444', 'style' => 'solid', 'altColor' => '#999999'];
-
-        $style = new Style(75, 'Courier', []);
-        $style->setStyles(['stateName.*' => $colorSet]);
-
-        $this->assertEquals($colorSet, $style->getStyle('state', 'stateName', 'eventName'));
-    }
-
-    public function testGetWildcardForEventStyle()
-    {
-        $colorSet = ['text' => '#000000', 'color' => '#444444', 'style' => 'solid', 'altColor' => '#999999'];
-
-        $style = new Style(75, 'Courier', []);
-        $style->setStyles(['*.eventName' => $colorSet]);
-
-        $this->assertEquals($colorSet, $style->getStyle('state', 'stateName', 'eventName'));
-    }
-
-    public function testOverwriteStateDefault()
-    {
-        $colorSet = ['text' => '#000000', 'color' => '#444444', 'style' => 'solid', 'altColor' => '#999999'];
-
-        $style = new Style(75, 'Courier', []);
-        $style->setStyles(['state' => $colorSet]);
-
-        $this->assertEquals($colorSet, $style->getStyle('state', 'stateName', 'eventName'));
+        $style = new Style('#444444', '#99BB11', 'ellipse', '#0066aa');
+        $this->assertEquals('ellipse', $style->getStyle());
     }
 }

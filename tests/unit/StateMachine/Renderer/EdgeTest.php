@@ -17,7 +17,29 @@ class EdgeTest extends \PHPUnit_Framework_TestCase
     {
         $expected = 'edge[label=" eventName",tooltip="comment",dir="forward",style="solid",color="#ffffff",fontcolor="#000000"] state_fromState -> state_toState;';
 
-        $dot = new Edge('fromState', 'toState', 'eventName', 'comment', '#ffffff', 'solid', '#000000');
+        $style = new Style('#000000', '#ffffff', 'solid');
+
+        $dot = new Edge('fromState', 'toState', 'eventName', $style, 'comment');
+        $this->assertEquals($expected, (string) $dot);
+    }
+
+    public function testToStringWithTimeoutInterval()
+    {
+        $expected = 'edge[label=" eventName\nP1DT10S",tooltip="comment",dir="forward",style="solid",color="#ffffff",fontcolor="#000000"] state_fromState -> state_toState;';
+
+        $style = new Style('#000000', '#ffffff', 'solid');
+
+        $dot = new Edge('fromState', 'toState', 'eventName', $style, 'comment', new \DateInterval('P1DT10S'));
+        $this->assertEquals($expected, (string) $dot);
+    }
+
+    public function testToStringWithTimeoutDate()
+    {
+        $expected = 'edge[label=" eventName\n2015-05-11T10:10:10+00:00",tooltip="comment",dir="forward",style="solid",color="#ffffff",fontcolor="#000000"] state_fromState -> state_toState;';
+
+        $style = new Style('#000000', '#ffffff', 'solid');
+
+        $dot = new Edge('fromState', 'toState', 'eventName', $style, 'comment', new \DateTime('2015-05-11 10:10:10', new \DateTimeZone('UTC')));
         $this->assertEquals($expected, (string) $dot);
     }
 }

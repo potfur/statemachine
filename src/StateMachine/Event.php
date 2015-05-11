@@ -146,6 +146,19 @@ final class Event implements EventInterface
     }
 
     /**
+     * Return list of transition types with target states
+     *
+     * @return array
+     */
+    public function getStates()
+    {
+        return [
+            'target' => $this->targetState,
+            'error' => $this->errorState
+        ];
+    }
+
+    /**
      * Return comment
      *
      * @return string

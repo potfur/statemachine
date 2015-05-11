@@ -39,20 +39,20 @@ class Renderer
     /**
      * Style collection
      *
-     * @var Style
+     * @var Stylist
      */
-    private $style;
+    private $stylist;
 
     /**
      * @param AdapterInterface $adapter    process/schema adapter
      * @param string           $executable path to dot executable
-     * @param Style            $style      style collection
+     * @param Stylist          $stylist    style collection
      */
-    public function __construct(AdapterInterface $adapter, $executable, Style $style)
+    public function __construct(AdapterInterface $adapter, $executable, Stylist $stylist)
     {
         $this->adapter = $adapter;
         $this->executable = $executable;
-        $this->style = $style;
+        $this->stylist = $stylist;
     }
 
     /**
@@ -104,8 +104,8 @@ class Renderer
     {
         $document = new Document(
             $this->adapter->getProcess()->getName(),
-            $this->style->getDPI(),
-            $this->style->getFont()
+            $this->stylist->getDPI(),
+            $this->stylist->getFont()
         );
 
         foreach ($this->adapter->getProcess()->getStates() as $state) {
@@ -129,17 +129,12 @@ class Renderer
      */
     private function addState(Document $document, StateInterface $state)
     {
-        $colors = $this->style->getStyle('state', $state->getName());
-
         $document->addState(
             new Node(
                 $state->getName(),
                 $state->getFlags(),
-                $state->getComment(),
-                $colors['color'],
-                $colors['text'],
-                $colors['style'],
-                $colors['altColor']
+                $this->stylist->getStyle('state', $state->getName()),
+                $state->getComment()
             )
         );
     }
@@ -153,12 +148,9 @@ class Renderer
      */
     private function addEvent(Document $document, StateInterface $state, EventInterface $event)
     {
-        if ($event->getTargetState()) {
-            $document->addEdge($this->createEdge($state, $event, $event->getTargetState(), $this->style->getStyle('target', $state->getName(), $event->getName())));
-        }
-
-        if ($event->getErrorState()) {
-            $document->addEdge($this->createEdge($state, $event, $event->getErrorState(), $this->style->getStyle('error', $state->getName(), $event->getName())));
+        foreach (array_filter($event->getStates()) as $type => $target) {
+            $style = $this->stylist->getStyle($type, $state->getName(), $event->getName());
+            $document->addEdge($this->createEdge($state, $event, $target, $style));
         }
     }
 
@@ -168,20 +160,19 @@ class Renderer
      * @param StateInterface $state
      * @param EventInterface $event
      * @param string         $nextState
-     * @param array          $style
+     * @param Style          $style
      *
      * @return Edge
      */
-    private function createEdge(StateInterface $state, EventInterface $event, $nextState, $style)
+    private function createEdge(StateInterface $state, EventInterface $event, $nextState, Style $style)
     {
         return new Edge(
             $state->getName(),
             $nextState,
             $event->getName(),
+            $style,
             $event->getComment(),
-            $style['color'],
-            $style['style'],
-            $style['text']
+            $event->getTimeout()
         );
     }
 

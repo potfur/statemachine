@@ -55,6 +55,17 @@ class EventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('errorState', $event->getErrorState());
     }
 
+    public function testStates()
+    {
+        $expected = [
+            'target' => 'targetState',
+            'error' => 'errorState'
+        ];
+
+        $event = new Event('eventName', 'targetState', 'errorState');
+        $this->assertEquals($expected, $event->getStates());
+    }
+
     public function testComment()
     {
         $event = new Event('eventName', null, 'errorState', null, null, 'Lorem ipsum');

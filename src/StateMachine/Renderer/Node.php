@@ -42,53 +42,26 @@ class Node implements DotInterface
     private $comment;
 
     /**
-     * Color used for node background
+     * Style
      *
-     * @var string
+     * @var Style
      */
-    private $fillColor;
-
-    /**
-     * Label color
-     *
-     * @var string
-     */
-    private $textColor;
-
-    /**
-     * Shape
-     *
-     * @var string
-     */
-    private $shape;
-
-    /**
-     * Color for flag names
-     *
-     * @var string
-     */
-    private $flagColor;
+    private $style;
 
     /**
      * Build edge/path between two nodes in dot format
      *
-     * @param string $state     state name
-     * @param Flag[] $flags     array with flags
-     * @param string $comment   description
-     * @param string $fillColor color shape background
-     * @param string $textColor text color
-     * @param string $shape     shape name
-     * @param string $flagColor color for flag names
+     * @param string $state   state name
+     * @param Flag[] $flags   array with flags
+     * @param string $comment description
+     * @param Style  $style   style
      */
-    public function __construct($state, array $flags, $comment = null, $fillColor = '#ebebeb', $textColor = '#444444', $shape = 'ellipse', $flagColor = '#0066aa')
+    public function __construct($state, array $flags, Style $style, $comment = null)
     {
         $this->state = $state;
         $this->flags = $flags;
         $this->comment = $comment;
-        $this->fillColor = $fillColor;
-        $this->textColor = $textColor;
-        $this->shape = $shape;
-        $this->flagColor = $flagColor;
+        $this->style = $style;
     }
 
     /**
@@ -101,10 +74,10 @@ class Node implements DotInterface
         return sprintf(
             'node[label=<%1$s%2$s>,tooltip="%6$s",height="0.6",shape="%5$s",style="filled",color="transparent",fillcolor="%3$s",fontcolor="%4$s"]{ state_%1$s };',
             $this->state,
-            $this->buildFlags($this->flags, $this->flagColor),
-            $this->fillColor,
-            $this->textColor,
-            $this->shape,
+            $this->buildFlags($this->flags, $this->style->getAltColor()),
+            $this->style->getColor(),
+            $this->style->getText(),
+            $this->style->getStyle(),
             $this->comment
         );
     }
