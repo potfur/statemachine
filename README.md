@@ -27,7 +27,7 @@ Cons:
 ## Next steps
  - factory for different schemas - **done**
  - comments for states & events - **done**
- - more timeout formats: date, interval string, seconds
+ - more timeout formats: date, interval string, seconds **done**
  - Renderer: onTimeOut must have its timeout displayed **done**
  - Renderer: onStateWasSet & onTimeOut should be distinguished in style - **done**
  
