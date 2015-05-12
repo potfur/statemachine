@@ -72,51 +72,30 @@ class EventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Lorem ipsum', $event->getComment());
     }
 
-    /**
-     * @dataProvider timeoutProvider
-     */
-    public function testHasTimeout($timeout)
+    public function testHasTimeout()
     {
+        $timeout = new Timeout('PT1S');
+
         $event = new Event('eventName', null, null, null, $timeout);
-        $this->assertEquals($timeout !== null, $event->hasTimeout());
+        $this->assertEquals(true, $event->hasTimeout());
     }
 
-    /**
-     * @dataProvider timeoutProvider
-     */
-    public function testGetTimeout($timeout)
+    public function testGetTimeout()
     {
+        $timeout = new Timeout('PT1S');
+
         $event = new Event('eventName', null, null, null, $timeout);
         $this->assertEquals($timeout, $event->getTimeout());
     }
 
-    /**
-     * @dataProvider timeoutProvider
-     */
-    public function testTimeoutAt($timeout, $expected)
+    public function testTimeoutAt()
     {
+        $timeout = new Timeout('PT1S');
         $now = new \DateTime('2015-03-31 10:10:10');
+        $expected = new \DateTime('2015-03-31 10:10:11');
 
-        $event = new Event('eventName', null, null, null, $timeout);
+        $event = new Event('eventName', null, null, null, new Timeout($timeout));
         $this->assertEquals($expected, $event->timeoutAt($now));
-    }
-
-    public function timeoutProvider()
-    {
-        return [
-            [new \DateTime('2015-04-01 10:10:10'), new \DateTime('2015-04-01 10:10:10')],
-            [new \DateInterval('PT60S'), new \DateTime('2015-03-31 10:11:10')],
-            [null, new \DateTime('2015-03-31 10:10:10')],
-        ];
-    }
-
-    /**
-     * @expectedException \StateMachine\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid timeout value, must be instance of \DateInterval for relative timeout, \DateTime for fixed date or null when without timeout
-     */
-    public function testInvalidTimeout()
-    {
-        new Event('eventName', null, null, null, 'foobar');
     }
 
     /**
@@ -125,7 +104,6 @@ class EventTest extends \PHPUnit_Framework_TestCase
     public function testTrigger($targetState, $errorState, $result, $expected)
     {
         $payload = $this->getMock('\StateMachine\PayloadInterface');
-
 
         $commands = new CommandCollection([new CommandMock($result)]);
 

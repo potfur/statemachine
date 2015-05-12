@@ -99,7 +99,7 @@ class StateMachineTest extends \PHPUnit_Framework_TestCase
 
     public function testTriggerEventWithTimeout()
     {
-        $timeout = $this->getMockBuilder('\StateMachine\Timeout')->disableOriginalConstructor()->getMock();
+        $timeout = $this->getMockBuilder('\StateMachine\PayloadTimeout')->disableOriginalConstructor()->getMock();
 
         $this->payload->expects($this->any())->method('hasChanged')->willReturn(true);
         $this->payloadHandler->expects($this->any())->method('restore')->willReturn($this->payload);
@@ -127,7 +127,7 @@ class StateMachineTest extends \PHPUnit_Framework_TestCase
 
     public function testResolveTimeoutsAndLockWithPayloadInInvalidState()
     {
-        $timeout = $this->getMockBuilder('\StateMachine\Timeout')->disableOriginalConstructor()->getMock();
+        $timeout = $this->getMockBuilder('\StateMachine\PayloadTimeout')->disableOriginalConstructor()->getMock();
         $timeout->expects($this->any())->method('getState')->willReturn('timeout');
         $timeout->expects($this->any())->method('getIdentifier')->willReturn('identifier');
 
@@ -145,7 +145,7 @@ class StateMachineTest extends \PHPUnit_Framework_TestCase
 
     public function testResolveTimeoutsAndLockWithPayloadInCorrectState()
     {
-        $timeout = $this->getMockBuilder('\StateMachine\Timeout')->disableOriginalConstructor()->getMock();
+        $timeout = $this->getMockBuilder('\StateMachine\PayloadTimeout')->disableOriginalConstructor()->getMock();
         $timeout->expects($this->any())->method('getState')->willReturn('timeout');
         $timeout->expects($this->any())->method('getIdentifier')->willReturn('identifier');
 
@@ -163,7 +163,7 @@ class StateMachineTest extends \PHPUnit_Framework_TestCase
 
     public function testResolveTimeoutsAndLockWithPayloadInCorrectStateButLocked()
     {
-        $timeout = $this->getMockBuilder('\StateMachine\Timeout')->disableOriginalConstructor()->getMock();
+        $timeout = $this->getMockBuilder('\StateMachine\PayloadTimeout')->disableOriginalConstructor()->getMock();
         $timeout->expects($this->any())->method('getState')->willReturn('timeout');
         $timeout->expects($this->any())->method('getIdentifier')->willReturn('identifier');
 
@@ -194,7 +194,7 @@ class StateMachineTest extends \PHPUnit_Framework_TestCase
 
     public function testResolveTimeoutsWithPayloadInInvalidState()
     {
-        $timeout = $this->getMockBuilder('\StateMachine\Timeout')->disableOriginalConstructor()->getMock();
+        $timeout = $this->getMockBuilder('\StateMachine\PayloadTimeout')->disableOriginalConstructor()->getMock();
         $timeout->expects($this->any())->method('getState')->willReturn('timeout');
 
         $this->timeoutHandler->expects($this->any())->method('getExpired')->willReturn([$timeout]);
@@ -211,7 +211,7 @@ class StateMachineTest extends \PHPUnit_Framework_TestCase
 
     public function testResolveTimeoutsWithPayloadInCorrectState()
     {
-        $timeout = $this->getMockBuilder('\StateMachine\Timeout')->disableOriginalConstructor()->getMock();
+        $timeout = $this->getMockBuilder('\StateMachine\PayloadTimeout')->disableOriginalConstructor()->getMock();
         $timeout->expects($this->any())->method('getState')->willReturn('timeout');
 
         $this->timeoutHandler->expects($this->any())->method('getExpired')->willReturn([$timeout]);

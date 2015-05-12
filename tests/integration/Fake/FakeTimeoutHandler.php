@@ -12,12 +12,12 @@
 namespace Fake;
 
 
-use StateMachine\Timeout;
+use StateMachine\PayloadTimeout;
 use StateMachine\TimeoutHandlerInterface;
 
 class FakeTimeoutHandler implements TimeoutHandlerInterface
 {
-    /** @var Timeout[] */
+    /** @var PayloadTimeout[] */
     private $timeouts = [];
 
     public function getExpired()
@@ -33,12 +33,12 @@ class FakeTimeoutHandler implements TimeoutHandlerInterface
         return $result;
     }
 
-    public function remove(Timeout $timeout)
+    public function remove(PayloadTimeout $timeout)
     {
         unset($this->timeouts[$timeout->getIdentifier()]);
     }
 
-    public function store(Timeout $timeout)
+    public function store(PayloadTimeout $timeout)
     {
         $this->timeouts[$timeout->getIdentifier()] = $timeout;
     }

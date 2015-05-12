@@ -11,6 +11,8 @@
 
 namespace StateMachine\Renderer;
 
+use StateMachine\Timeout;
+
 class EdgeTest extends \PHPUnit_Framework_TestCase
 {
     public function testToString()
@@ -29,7 +31,7 @@ class EdgeTest extends \PHPUnit_Framework_TestCase
 
         $style = new Style('#000000', '#ffffff', 'solid');
 
-        $dot = new Edge('fromState', 'toState', 'eventName', $style, 'comment', new \DateInterval('P1DT10S'));
+        $dot = new Edge('fromState', 'toState', 'eventName', $style, 'comment', new Timeout(new \DateInterval('P1DT10S')));
         $this->assertEquals($expected, (string) $dot);
     }
 
@@ -39,7 +41,7 @@ class EdgeTest extends \PHPUnit_Framework_TestCase
 
         $style = new Style('#000000', '#ffffff', 'solid');
 
-        $dot = new Edge('fromState', 'toState', 'eventName', $style, 'comment', new \DateTime('2015-05-11 10:10:10', new \DateTimeZone('UTC')));
+        $dot = new Edge('fromState', 'toState', 'eventName', $style, 'comment', new Timeout(new \DateTime('2015-05-11 10:10:10', new \DateTimeZone('UTC'))));
         $this->assertEquals($expected, (string) $dot);
     }
 }

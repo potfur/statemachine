@@ -21,105 +21,159 @@ use StateMachine\Exception\InvalidArgumentException;
 class Timeout
 {
     /**
-     * State name where timeout occurred
+     * Timeout value
      *
-     * @var string
+     * @var \DateTime|\DateInterval
      */
-    private $state;
-
-    /**
-     * Event name, usually onTimeout
-     *
-     * @var string
-     */
-    private $event;
-
-    /**
-     * Context identifier
-     *
-     * @var mixed
-     */
-    private $identifier;
-
-    /**
-     * Date when timeout should be executed
-     *
-     * @var \DateTime
-     */
-    private $execution;
+    private $timeout;
 
     /**
      * Constructor
      *
-     * @param string    $state      state name
-     * @param string    $event      event name
-     * @param mixed     $identifier context identifier
-     * @param \DateTime $execution  execution date
+     * @param mixed  $timeout timeout value
      *
      * @throws InvalidArgumentException
      */
-    public function __construct($state, $event, $identifier, \DateTime $execution)
+    public function __construct($timeout)
     {
-        $this->assertName($state);
-        $this->assertName($event);
-
-        $this->state = $state;
-        $this->event = $event;
-        $this->identifier = $identifier;
-        $this->execution = $execution;
+        $this->timeout = $this->convert($timeout);
     }
 
+
     /**
-     * Assert if name is non empty string
+     * Convert different timeout formats to \DateTime or \DateInterval
+     * Handles integers, strings and callable.
+     * \DateInterval:
+     *  - integers are treated as seconds,
+     *  - strings starting with P are treated as ISO 8601 durations
+     * \DateTime:
+     *  - other strings will be treated as date time format
      *
-     * @param string $name
+     * @see http://en.wikipedia.org/wiki/ISO_8601#Durations
+     * @see http://php.net/manual/en/datetime.formats.php
      *
-     * @throws InvalidArgumentException
+     * @param mixed $value
+     *
+     * @return \DateTime|\DateInterval
      */
-    private function assertName($name)
+    private function convert($value)
     {
-        if (empty($name)) {
-            throw new InvalidArgumentException('Invalid state or event name in timeout, can not be empty string');
+        if ($value instanceof \DateTime || $value instanceof \DateInterval) {
+            return $value;
         }
+
+        if (filter_var($value, FILTER_VALIDATE_INT)) {
+            return new \DateInterval(sprintf('PT%uS', $value));
+        }
+
+        if (strpos($value, 'P') === 0) {
+            return new \DateInterval($value);
+        }
+
+        return new \DateTime($value);
     }
 
     /**
-     * Return state name
+     * Return timeout value
      *
-     * @return string
+     * @return \DateInterval|\DateTime
      */
-    public function getState()
+    public function getTimeout()
     {
-        return $this->state;
+        return $this->timeout;
     }
 
     /**
-     * Return event name
+     * Return when event timeout
      *
-     * @return string
-     */
-    public function getEvent()
-    {
-        return $this->event;
-    }
-
-    /**
-     * Return identifier
-     *
-     * @return mixed
-     */
-    public function getIdentifier()
-    {
-        return $this->identifier;
-    }
-
-    /**
-     * Return execution time
+     * @param \DateTime $now date will be used as reference for timeouts defined as intervals
      *
      * @return \DateTime
      */
-    public function getExecutionDate()
+    public function timeoutAt(\DateTime $now)
     {
-        return $this->execution;
+        if ($this->timeout instanceof \DateInterval) {
+            return $now->add($this->timeout);
+        }
+
+        return $this->timeout;
+    }
+
+    /**
+     * Build timeout string representation
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        if ($this->timeout instanceof \DateInterval) {
+            return $this->intervalToString($this->timeout);
+        }
+
+        return $this->dateToString($this->timeout);
+    }
+
+    /**
+     * Convert DateInterval to interval string
+     *
+     * @see http://en.wikipedia.org/wiki/ISO_8601#Durations
+     *
+     * @param \DateInterval $interval
+     *
+     * @return string
+     */
+    private function intervalToString(\DateInterval $interval)
+    {
+        $date = [
+            'Y' => $interval->y,
+            'M' => $interval->m,
+            'D' => $interval->d
+        ];
+
+        $time = [
+            'H' => $interval->h,
+            'M' => $interval->i,
+            'S' => $interval->s
+        ];
+
+        $str = 'P' . $this->implodeDuration($date);
+
+        if (array_sum($time)) {
+            $str .= 'T' . $this->implodeDuration($time);
+        }
+
+        return $str;
+    }
+
+    /**
+     * Implodes duration array into string
+     *
+     * @param array $duration
+     *
+     * @return string
+     */
+    private function implodeDuration(array $duration)
+    {
+        $str = '';
+        $duration = array_filter($duration);
+        foreach ($duration as $key => $value) {
+            $str .= $value . $key;
+        }
+
+        return $str;
+    }
+
+    /**
+     * Convert DateTime to string
+     *
+     * @see http://en.wikipedia.org/wiki/ISO_8601#Dates
+     *
+     * @param \DateTime $dateTime
+     *
+     * @return string
+     */
+    private function dateToString(\DateTime $dateTime)
+    {
+        return $dateTime->format('c');
     }
 }

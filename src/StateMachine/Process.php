@@ -240,13 +240,18 @@ final class Process implements ProcessInterface
      * @param PayloadInterface $payload
      * @param \DateTime        $now date will be used as reference for timeouts defined as intervals
      *
-     * @return Timeout
+     * @return PayloadTimeout
      */
     public function getTimeout(PayloadInterface $payload, \DateTime $now)
     {
         $state = $this->getState($payload->getState());
         $event = $state->getEvent(self::ON_TIME_OUT);
 
-        return new Timeout($state->getName(), self::ON_TIME_OUT, $payload->getIdentifier(), $event->timeoutAt($now));
+        return new PayloadTimeout(
+            $state->getName(),
+            $event->getName(),
+            $payload->getIdentifier(),
+            $event->timeoutAt($now)
+        );
     }
 }

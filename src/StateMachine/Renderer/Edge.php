@@ -11,6 +11,8 @@
 
 namespace StateMachine\Renderer;
 
+use StateMachine\Timeout;
+
 /**
  * Edge representing state machine event target and error path
  *
@@ -56,21 +58,21 @@ final class Edge implements DotInterface
     /**
      * Timeout
      *
-     * @var \DateInterval|\DateTime|null
+     * @var Timeout|null
      */
     private $timeout;
 
     /**
      * Build edge/path between two nodes in dot format
      *
-     * @param string                  $fromState source state
-     * @param string                  $toState   target state
-     * @param string                  $event     event name
-     * @param Style                   $style     $style
-     * @param string                  $comment   description
-     * @param \DateTime|\DateInterval $timeout   timeout interval or fixed date
+     * @param string       $fromState source state
+     * @param string       $toState   target state
+     * @param string       $event     event name
+     * @param Style        $style     edge style
+     * @param string       $comment   description
+     * @param Timeout|null $timeout   timeout interval or fixed date
      */
-    public function __construct($fromState, $toState, $event, Style $style, $comment = null, $timeout = null)
+    public function __construct($fromState, $toState, $event, Style $style, $comment = null, Timeout $timeout = null)
     {
         $this->fromState = $fromState;
         $this->toState = $toState;
@@ -111,64 +113,6 @@ final class Edge implements DotInterface
             return '';
         }
 
-        if ($this->timeout instanceof \DateInterval) {
-            return $this->intervalToString($this->timeout);
-        }
-
-        return $this->dateToString($this->timeout);
-    }
-
-    /**
-     * Convert DateInterval to interval string
-     * @see http://en.wikipedia.org/wiki/ISO_8601#Durations
-     *
-     * @param \DateInterval $interval
-     *
-     * @return string
-     */
-    private function intervalToString(\DateInterval $interval)
-    {
-        $date = array_filter(
-            [
-                'Y' => $interval->y,
-                'M' => $interval->m,
-                'D' => $interval->d
-            ]
-        );
-
-        $time = array_filter(
-            [
-                'H' => $interval->h,
-                'M' => $interval->i,
-                'S' => $interval->s
-            ]
-        );
-
-        $str = 'P';
-        foreach ($date as $key => $value) {
-            $str .= $value . $key;
-        }
-
-        if (!empty($time)) {
-            $str .= 'T';
-            foreach ($time as $key => $value) {
-                $str .= $value . $key;
-            }
-        }
-
-        return '\n' . $str;
-    }
-
-    /**
-     * Convert DateTime to string
-     * @see http://en.wikipedia.org/wiki/ISO_8601#Dates
-     *
-     * @param \DateTime $dateTime
-     *
-     * @return string
-     */
-    private function dateToString(\DateTime $dateTime)
-    {
-        return '\n' . $dateTime->format('c');
+        return '\n' . (string) $this->timeout;
     }
 }

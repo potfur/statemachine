@@ -49,9 +49,9 @@ final class Event implements EventInterface
     private $commands;
 
     /**
-     * Timeout as fixed date or relative interval
+     * Timeout
      *
-     * @var \DateInterval|\DateTime
+     * @var Timeout|null
      */
     private $timeout;
 
@@ -65,17 +65,16 @@ final class Event implements EventInterface
     /**
      * Constructor
      *
-     * @param string                       $name        event name
-     * @param string                       $targetState state where subject will go when all commands were executed successfully
-     * @param string                       $errorState  state where subject will go when command execution failed
-     * @param CommandCollection            $commands    collection of commands
-     * @param null|\DateInterval|\DateTime $timeout     date or interval when event should timeout
-     * @param string                       $comment     additional comment
+     * @param string            $name        event name
+     * @param string            $targetState state where subject will go when all commands were executed successfully
+     * @param string            $errorState  state where subject will go when command execution failed
+     * @param CommandCollection $commands    collection of commands
+     * @param Timeout|null      $timeout     date or interval when event should timeout
+     * @param string            $comment     additional comment
      */
-    public function __construct($name, $targetState = null, $errorState = null, CommandCollection $commands = null, $timeout = null, $comment = null)
+    public function __construct($name, $targetState = null, $errorState = null, CommandCollection $commands = null, Timeout $timeout = null, $comment = null)
     {
         $this->assertName($name);
-        $this->assertTimeout($timeout);
 
         $this->name = $name;
         $this->targetState = $targetState;
@@ -96,20 +95,6 @@ final class Event implements EventInterface
     {
         if (empty($name)) {
             throw new InvalidArgumentException('Invalid event name, can not be empty string');
-        }
-    }
-
-    /**
-     * Assert if timeout is \DateInterval, \DateTime or null
-     *
-     * @param null|\DateInterval|\DateTime $timeout
-     *
-     * @throws InvalidArgumentException
-     */
-    private function assertTimeout($timeout)
-    {
-        if ($timeout !== null && !$timeout instanceof \DateInterval && !$timeout instanceof \DateTime) {
-            throw new InvalidArgumentException('Invalid timeout value, must be instance of \DateInterval for relative timeout, \DateTime for fixed date or null when without timeout');
         }
     }
 
@@ -197,15 +182,7 @@ final class Event implements EventInterface
      */
     public function timeoutAt(\DateTime $now)
     {
-        if ($this->timeout instanceof \DateTime) {
-            return $this->timeout;
-        }
-
-        if ($this->timeout instanceof \DateInterval) {
-            return $now->add($this->timeout);
-        }
-
-        return $now;
+        return $this->timeout->timeoutAt($now);
     }
 
     /**

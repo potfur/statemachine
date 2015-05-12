@@ -112,12 +112,13 @@ class StateMachine
 
     /**
      * Resolve single timeout
+
      *
-     * @param ProcessInterface $process
-     * @param Timeout          $timeout
+*@param ProcessInterface $process
+     * @param PayloadTimeout          $timeout
      * @param  array           $result
      */
-    private function resolveTimeout(ProcessInterface $process, Timeout $timeout, &$result)
+    private function resolveTimeout(ProcessInterface $process, PayloadTimeout $timeout, &$result)
     {
         if ($this->lockHandler->isLocked($timeout->getIdentifier())) {
             return;

@@ -17,24 +17,15 @@ use StateMachine\Event;
 use StateMachine\Flag;
 use StateMachine\Process;
 use StateMachine\State;
+use StateMachine\Timeout;
 
 class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \StateMachine\TimeoutConverterInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $converter;
-
-    public function setUp()
-    {
-        $this->converter = $this->getMock('\StateMachine\TimeoutConverterInterface');
-    }
-
     public function testGetSchemaName()
     {
         $schema = ['name' => 'schemaName'];
 
-        $adapter = new ArrayAdapter($schema, $this->converter);
+        $adapter = new ArrayAdapter($schema);
         $this->assertEquals('schemaName', $adapter->getSchemaName());
     }
 
@@ -42,7 +33,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
     {
         $schema = ['subjectClass' => '\stdClass'];
 
-        $adapter = new ArrayAdapter($schema, $this->converter);
+        $adapter = new ArrayAdapter($schema);
         $this->assertEquals('\stdClass', $adapter->getSubjectClass());
     }
 
@@ -50,7 +41,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
     {
         $schema = ['initialState' => 'new'];
 
-        $adapter = new ArrayAdapter($schema, $this->converter);
+        $adapter = new ArrayAdapter($schema);
         $this->assertEquals('new', $adapter->getInitialState());
     }
 
@@ -114,7 +105,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
                             'pending',
                             'error',
                             new CommandCollection(),
-                            new \DateInterval('PT10S'),
+                            new Timeout(new \DateInterval('PT10S')),
                             'comment'
                         )
                     ],
@@ -126,9 +117,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $this->converter->expects($this->any())->method('convert')->willReturnArgument(0);
-
-        $adapter = new ArrayAdapter($schema, $this->converter);
+        $adapter = new ArrayAdapter($schema);
         $this->assertEquals($expected, $adapter->getProcess());
     }
 }

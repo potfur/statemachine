@@ -18,7 +18,7 @@ use StateMachine\EventInterface;
 use StateMachine\Flag;
 use StateMachine\Process;
 use StateMachine\State;
-use StateMachine\TimeoutConverterInterface;
+use StateMachine\Timeout;
 
 /**
  * Adapter for array schemas
@@ -35,11 +35,6 @@ class ArrayAdapter implements AdapterInterface
     private $schema;
 
     /**
-     * @var TimeoutConverterInterface
-     */
-    private $converter;
-
-    /**
      * Resolved process instance
      *
      * @var Process
@@ -49,13 +44,11 @@ class ArrayAdapter implements AdapterInterface
     /**
      * Construct
      *
-     * @param array                     $schema
-     * @param TimeoutConverterInterface $converter
+     * @param array $schema
      */
-    public function __construct(array $schema, TimeoutConverterInterface $converter)
+    public function __construct(array $schema)
     {
         $this->schema = $schema;
-        $this->converter = $converter;
     }
 
     /**
@@ -132,7 +125,7 @@ class ArrayAdapter implements AdapterInterface
      *
      * @return EventInterface[]
      */
-    private function buildEvents($state)
+    private function buildEvents(array $state)
     {
         $events = [];
         foreach ($this->getOffsetFromArray($state, 'events', []) as $event) {
@@ -152,9 +145,9 @@ class ArrayAdapter implements AdapterInterface
     /**
      * Build timeout
      *
-     * @param mixed $timeout
+     * @param mixed  $timeout
      *
-     * @return \DateInterval|\DateTime|null
+     * @return null|Timeout
      */
     private function buildTimeout($timeout)
     {
@@ -162,7 +155,7 @@ class ArrayAdapter implements AdapterInterface
             return null;
         }
 
-        return $this->converter->convert($timeout);
+        return new Timeout($timeout);
     }
 
     /**

@@ -1,7 +1,7 @@
 <?php
 
 /*
-* This file is part of the StateMachine package
+* This file is part of the statemachine package
 *
 * (c) Michal Wachowski <wachowski.michal@gmail.com>
 *
@@ -9,52 +9,69 @@
 * file that was distributed with this source code.
 */
 
-namespace StateMachine;
+namespace unit\StateMachine;
 
+
+use StateMachine\Timeout;
 
 class TimeoutTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException \StateMachine\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid state or event name in timeout, can not be empty string
+     * @dataProvider formatProvider
      */
-    public function testStateNameIsNull()
+    public function testFormat($value, $expected)
     {
-        new Timeout('', 'eventName', 'identifier', new \DateTime());
+        $timeout = new Timeout($value);
+        $this->assertEquals($expected, $timeout->getTimeout());
+    }
+
+    public function formatProvider()
+    {
+        return [
+            [new \DateInterval('PT10S'), new \DateInterval('PT10S')],
+            [new \DateTime('2015-05-11 10:10:10'), new \DateTime('2015-05-11 10:10:10')],
+            [10, new \DateInterval('PT10S')],
+            ['PT10S', new \DateInterval('PT10S')],
+            ['midnight +2 days', new \DateTime('midnight +2 days')],
+            ['2015-05-11 10:10:10', new \DateTime('2015-05-11 10:10:10')],
+        ];
     }
 
     /**
-     * @expectedException \StateMachine\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid state or event name in timeout, can not be empty string
+     * @dataProvider stringProvider
      */
-    public function testEventNameIsNull()
+    public function testString($value, $expected)
     {
-        new Timeout('stateName', '', 'identifier', new \DateTime());
+        $timeout = new Timeout($value);
+        $this->assertEquals($expected, (string) $timeout);
     }
 
-    public function testGetState()
+    public function stringProvider()
     {
-        $timeout = new Timeout('stateName', 'eventName', 'identifier', new \DateTime());
-        $this->assertEquals('stateName', $timeout->getState());
+        return [
+            ['PT10S', 'PT10S'],
+            ['P2D', 'P2D'],
+            ['P2DT10S', 'P2DT10S'],
+            ['2015-05-11 10:10:10', (new \DateTime('2015-05-11 10:10:10'))->format('c')],
+        ];
     }
 
-    public function testGetEvent()
+    /**
+     * @dataProvider timeoutProvider
+     */
+    public function testTimeoutAt($value, $expected)
     {
-        $timeout = new Timeout('stateName', 'eventName', 'identifier', new \DateTime());
-        $this->assertEquals('eventName', $timeout->getEvent());
+        $now = new \DateTime('2015-03-31 10:10:10');
+
+        $timeout = new Timeout($value);
+        $this->assertEquals($expected, $timeout->timeoutAt($now));
     }
 
-    public function testGetIdentifier()
+    public function timeoutProvider()
     {
-        $timeout = new Timeout('stateName', 'eventName', 'identifier', new \DateTime());
-        $this->assertEquals('identifier', $timeout->getIdentifier());
-    }
-
-    public function testGetExecutionDate()
-    {
-        $date = new \DateTime();
-
-        $timeout = new Timeout('stateName', 'eventName', 'identifier', $date);
-        $this->assertEquals($date, $timeout->getExecutionDate());
+        return [
+            [new \DateTime('2015-04-01 10:10:10'), new \DateTime('2015-04-01 10:10:10')],
+            [new \DateInterval('PT60S'), new \DateTime('2015-03-31 10:11:10')],
+        ];
     }
 }
