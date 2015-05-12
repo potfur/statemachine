@@ -32,7 +32,7 @@ final class GenericCollection implements \Countable
     /**
      * Interface/class that limits collection elements
      *
-     * @var null|string
+     * @var string|null
      */
     private $instanceOf;
 
@@ -41,7 +41,7 @@ final class GenericCollection implements \Countable
      * Creates collection that can be limited to certain instances
      *
      * @param array       $collection      collection elements
-     * @param null|string $onlyInstancesOf fully qualified interface/class that limits collection elements
+     * @param string|null $onlyInstancesOf fully qualified interface/class that limits collection elements
      */
     public function __construct(array $collection = [], $onlyInstancesOf = null)
     {

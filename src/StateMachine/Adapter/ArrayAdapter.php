@@ -147,7 +147,7 @@ class ArrayAdapter implements AdapterInterface
      *
      * @param mixed  $timeout
      *
-     * @return null|Timeout
+     * @return Timeout|null
      */
     private function buildTimeout($timeout)
     {

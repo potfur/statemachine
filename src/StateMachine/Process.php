@@ -193,7 +193,7 @@ final class Process implements ProcessInterface
      * @param StateInterface   $state
      * @param PayloadInterface $payload
      *
-     * @return null|StateInterface
+     * @return StateInterface|null
      */
     private function handleOnStateWasSet(StateInterface $state, PayloadInterface $payload)
     {

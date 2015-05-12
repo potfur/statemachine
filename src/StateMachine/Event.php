@@ -166,7 +166,7 @@ final class Event implements EventInterface
     /**
      * Return timeout value
      *
-     * @return null|\DateTime|\DateInterval
+     * @return Timeout|null
      */
     public function getTimeout()
     {
