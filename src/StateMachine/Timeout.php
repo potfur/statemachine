@@ -36,7 +36,11 @@ class Timeout
      */
     public function __construct($timeout)
     {
-        $this->timeout = $this->convert($timeout);
+        if (!$timeout instanceof \DateTime && !$timeout instanceof \DateInterval) {
+            $timeout = $this->convert($timeout);
+        }
+
+        $this->timeout = $timeout;
     }
 
 
@@ -58,10 +62,6 @@ class Timeout
      */
     private function convert($value)
     {
-        if ($value instanceof \DateTime || $value instanceof \DateInterval) {
-            return $value;
-        }
-
         if (filter_var($value, FILTER_VALIDATE_INT)) {
             return new \DateInterval(sprintf('PT%uS', $value));
         }
