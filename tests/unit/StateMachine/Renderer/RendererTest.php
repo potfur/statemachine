@@ -24,102 +24,36 @@ function shell_exec($cmd) { echo $cmd; }
 class RendererTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var StateInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var Document
      */
-    private $state;
-
-    /**
-     * @var ProcessInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $process;
-
-    /**
-     * @var AdapterInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $adapter;
+    private $document;
 
     public function setUp()
     {
-        $this->state = $this->getMock('\StateMachine\StateInterface');
-
-        $this->process = $this->getMock('\StateMachine\ProcessInterface');
-        $this->process->expects($this->any())->method('getStates')->willReturn([$this->state]);
-
-        $this->adapter = $this->getMock('\StateMachine\AdapterInterface');
-        $this->adapter->expects($this->any())->method('getProcess')->willReturn($this->process);
+        $this->document = new Document('Test doc');
     }
 
     public function tearDown()
     {
-        foreach (['./foo.dot', './foo.png', './foo.svg', './smrtmp'] as $file) {
+        foreach (['./foo.png', './foo.svg', './smrtmp'] as $file) {
             if (is_file($file)) {
                 unlink($file);
             }
         }
     }
 
-    public function testDotFormat()
-    {
-        $this->state->expects($this->any())->method('getName')->willReturn('name');
-        $this->state->expects($this->any())->method('getFlags')->willReturn([]);
-        $this->state->expects($this->any())->method('getEvents')->willReturn([]);
-
-        $this->process->expects($this->any())->method('getName')->willReturn('processName');
-
-        $renderer = new Renderer($this->adapter, '/usr/local/bin/dot', new Stylist());
-        $renderer->dot('./foo.dot');
-
-        $this->assertFileExists('./foo.dot');
-
-        // reversed, expected is actual
-        $this->assertStringEqualsFile('./foo.dot', 'digraph processName {dpi="75";pad="1";fontname="Courier";nodesep="1";rankdir="TD";ranksep="0.5";node[label=<name>,tooltip="",height="0.6",shape="ellipse",style="filled",color="transparent",fillcolor="#ebebeb",fontcolor="#444444"]{ state_name };}');
-    }
-
-    public function testDotFormatWithEvent()
-    {
-        $event = $this->getMockBuilder('\StateMachine\EventInterface')->disableOriginalConstructor()->getMock();
-        $event->expects($this->any())->method('getName')->willReturn('eventName');
-        $event->expects($this->any())->method('getStates')->willReturn(['target' => 'targetState', 'error' => 'errorState']);
-
-        $this->state->expects($this->any())->method('getName')->willReturn('name');
-        $this->state->expects($this->any())->method('getFlags')->willReturn([]);
-        $this->state->expects($this->any())->method('getEvents')->willReturn([$event]);
-
-        $this->process->expects($this->any())->method('getName')->willReturn('processName');
-
-        $renderer = new Renderer($this->adapter, '/usr/local/bin/dot', new Stylist());
-        $renderer->dot('./foo.dot');
-
-        $this->assertFileExists('./foo.dot');
-
-        // reversed, expected is actual
-        $this->assertStringEqualsFile('./foo.dot', 'digraph processName {dpi="75";pad="1";fontname="Courier";nodesep="1";rankdir="TD";ranksep="0.5";node[label=<name>,tooltip="",height="0.6",shape="ellipse",style="filled",color="transparent",fillcolor="#ebebeb",fontcolor="#444444"]{ state_name };edge[label=" eventName",tooltip="",dir="forward",style="solid",color="#99BB11",fontcolor="#999999"] state_name -> state_targetState;edge[label=" eventName",tooltip="",dir="forward",style="solid",color="#ee1155",fontcolor="#999999"] state_name -> state_errorState;}');
-    }
-
     public function testPNG()
     {
-        $this->state->expects($this->any())->method('getName')->willReturn('name');
-        $this->state->expects($this->any())->method('getFlags')->willReturn([]);
-        $this->state->expects($this->any())->method('getEvents')->willReturn([]);
-
-        $this->process->expects($this->any())->method('getName')->willReturn('processName');
-
-        $renderer = new Renderer($this->adapter, '/usr/local/bin/dot', new Stylist());
-        $renderer->png('./foo.png');
+        $renderer = new Renderer('/usr/local/bin/dot');
+        $renderer->png($this->document, './foo.png');
 
         $this->expectOutputString('/usr/local/bin/dot -Tpng ./smrtmp -o./foo.png');
     }
 
     public function testSVG()
     {
-        $this->state->expects($this->any())->method('getName')->willReturn('name');
-        $this->state->expects($this->any())->method('getFlags')->willReturn([]);
-        $this->state->expects($this->any())->method('getEvents')->willReturn([]);
-
-        $this->process->expects($this->any())->method('getName')->willReturn('processName');
-
-        $renderer = new Renderer($this->adapter, '/usr/local/bin/dot', new Stylist());
-        $renderer->svg('./foo.svg');
+        $renderer = new Renderer('/usr/local/bin/dot');
+        $renderer->svg($this->document, './foo.svg');
 
         $this->expectOutputString('/usr/local/bin/dot -Tsvg ./smrtmp -o./foo.svg');
     }
