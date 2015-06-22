@@ -20,7 +20,7 @@ use StateMachine\StateInterface;
  *
  * @package StateMachine
  */
-final class DocumentBuilder
+class DocumentBuilder
 {
     /**
      * Style collection

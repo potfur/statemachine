@@ -11,15 +11,39 @@
 
 namespace StateMachine\Renderer;
 
-
-final class Style
+/**
+ * Style definition for stylist
+ *
+ * @package StateMachine
+ */
+class Style
 {
+    /**
+     * Text color
+     *
+     * @var string
+     */
     private $text;
 
+    /**
+     * Primary color
+     *
+     * @var string
+     */
     private $color;
 
+    /**
+     * Alternative color
+     *
+     * @var string
+     */
     private $altColor;
 
+    /**
+     * Shape/edge style
+     *
+     * @var string
+     */
     private $style;
 
     /**

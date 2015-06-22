@@ -20,7 +20,7 @@ use StateMachine\Exception\OutOfRangeException;
  *
  * @package StateMachine
  */
-final class GenericCollection implements \Countable
+class GenericCollection implements \Countable
 {
     /**
      * Collection elements

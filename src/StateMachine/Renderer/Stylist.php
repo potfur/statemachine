@@ -18,7 +18,7 @@ use StateMachine\Exception\InvalidArgumentException;
  *
  * @package StateMachine
  */
-final class Stylist
+class Stylist
 {
     const GLUE = '.';
     const WILDCARD = '*';
