@@ -24,8 +24,4 @@ Cons:
  - can lead to code duplication
  - _context_ can end in undefined (eg. removed) _state_
 
-## Next steps
- - exceptions for graphviz related errors - **done**
- - prefix renderer specific parameters
- 
 ![](https://github.com/potfur/statemachine/wiki/schema.png)
