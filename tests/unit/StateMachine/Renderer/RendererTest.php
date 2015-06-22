@@ -11,18 +11,20 @@
 
 namespace StateMachine\Renderer;
 
-use StateMachine\AdapterInterface;
-use StateMachine\ProcessInterface;
-use StateMachine\StateInterface;
 
 function sys_get_temp_dir() { return './'; }
 
 function tempnam($dir, $prefix = null) { return $dir . $prefix . 'tmp'; }
 
-function shell_exec($cmd) { echo $cmd; }
+function exec($cmd, &$output, &$status) { echo $cmd; $output = []; $status = RendererTest::$status; }
 
 class RendererTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var int
+     */
+    public static $status;
+
     /**
      * @var Document
      */
@@ -30,6 +32,8 @@ class RendererTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        self::$status = 0;
+
         $this->document = new Document('Test doc');
     }
 
@@ -40,6 +44,18 @@ class RendererTest extends \PHPUnit_Framework_TestCase
                 unlink($file);
             }
         }
+    }
+
+    /**
+     * @expectedException \StateMachine\Exception\GraphvizException
+     * @expectedExceptionMessage Unable to render graph from dot file
+     */
+    public function testInvalidExecPath()
+    {
+        self::$status = 1;
+
+        $renderer = new Renderer('/usr/local/bin/dot');
+        $renderer->png($this->document, './foo.png');
     }
 
     public function testPNG()

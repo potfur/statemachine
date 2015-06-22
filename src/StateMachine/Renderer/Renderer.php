@@ -11,9 +11,7 @@
 
 namespace StateMachine\Renderer;
 
-use StateMachine\AdapterInterface;
-use StateMachine\EventInterface;
-use StateMachine\StateInterface;
+use StateMachine\Exception\GraphvizException;
 
 /**
  * State machine process renderer
@@ -49,11 +47,7 @@ class Renderer
      */
     public function png(Document $document, $outputFile)
     {
-        $tempFile = $this->buildDotFile($document);
-
-        shell_exec(sprintf('%s -Tpng %s -o%s', $this->executable, $tempFile, $outputFile));
-
-        return $outputFile;
+        return $this->exec($document, $outputFile, 'png');
     }
 
     /**
@@ -68,9 +62,36 @@ class Renderer
      */
     public function svg(Document $document, $outputFile)
     {
+        return $this->exec($document, $outputFile, 'svg');
+    }
+
+    /**
+     * Execute system call to Graphviz
+     * Return path to output file
+     *
+     * @param Document $document
+     * @param string   $outputFile
+     * @param string   $format
+     *
+     * @return string
+     * @throws GraphvizException
+     */
+    private function exec(Document $document, $outputFile, $format)
+    {
         $tempFile = $this->buildDotFile($document);
 
-        shell_exec(sprintf('%s -Tsvg %s -o%s', $this->executable, $tempFile, $outputFile));
+        $output = [];
+        $status = 0;
+
+        exec(
+            sprintf('%s -T%s %s -o%s', $this->executable, $format, $tempFile, $outputFile),
+            $output,
+            $status
+        );
+
+        if ($status !== 0) {
+            throw new GraphvizException('Unable to render graph from dot file', $status);
+        }
 
         return $outputFile;
     }
