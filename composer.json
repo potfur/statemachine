@@ -1,6 +1,6 @@
 {
   "name": "potfur/statemachine",
-  "version": "v0.5",
+  "version": "v0.6",
   "description": "State machine",
   "license": "MIT",
   "authors": [
@@ -21,9 +21,9 @@
     "bin-dir": "bin"
   },
   "autoload": {
-    "psr-4": {"StateMachine\\": "./src/StateMachine"}
+    "psr-0": {"StateMachine\\": "./src/"}
   },
   "autoload-dev": {
-    "psr-4": {"Fake\\": "./tests/integration/Fake"}
+    "psr-0": {"Fake\\": "./tests/integration"}
   }
 }
