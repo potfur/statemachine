@@ -220,12 +220,6 @@ class ArrayAdapter implements AdapterInterface
      */
     private function getAdditionalFromArray(array $array, array $ignoredKeys)
     {
-        return array_filter(
-            $array,
-            function ($key) use ($ignoredKeys) {
-                return !in_array($key, $ignoredKeys);
-            },
-            \ARRAY_FILTER_USE_KEY
-        );
+        return array_intersect_key($array, array_diff_key($array, array_flip($ignoredKeys)));
     }
 }
