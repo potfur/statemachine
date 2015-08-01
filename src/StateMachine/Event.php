@@ -58,7 +58,7 @@ final class Event implements EventInterface
     /**
      * Additional comment
      *
-     * @var string
+     * @var AttributeCollectionInterface
      */
     private $attributes;
 
