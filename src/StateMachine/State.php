@@ -33,26 +33,27 @@ final class State implements StateInterface
     private $flags;
 
     /**
-     * Additional comment
+     * Additional attributes
+
      *
-     * @var string
+*@var AttributeCollectionInterface
      */
-    private $comment;
+    private $attributes;
 
     /**
      * @param string           $name state name
      * @param EventInterface[] $events list of events in state
      * @param Flag[]           $flags array with state flags
-     * @param string           $comment optional comment
+     * @param array           $attributes additional attributes like comment etc.
      */
-    public function __construct($name, array $events = [], array $flags = [], $comment = null)
+    public function __construct($name, array $events = [], array $flags = [], array $attributes = [])
     {
         $this->assertName($name);
 
         $this->name = $name;
         $this->events = new GenericCollection($events, '\StateMachine\EventInterface');
         $this->flags = new GenericCollection($flags, '\StateMachine\Flag');
-        $this->comment = $comment;
+        $this->attributes = new AttributeCollection($attributes);
     }
 
     /**
@@ -148,13 +149,14 @@ final class State implements StateInterface
     }
 
     /**
-     * Return comment
+     * Return attributes container
+
      *
-     * @return string
+*@return AttributeCollectionInterface
      */
-    public function getComment()
+    public function getAttributes()
     {
-        return $this->comment;
+        return $this->attributes;
     }
 
     /**

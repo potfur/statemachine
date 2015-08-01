@@ -46,9 +46,12 @@ class DocumentBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testDotFormat()
     {
+        $attributes = $this->getMock('\StateMachine\AttributeCollectionInterface');
+
         $this->state->expects($this->any())->method('getName')->willReturn('name');
         $this->state->expects($this->any())->method('getFlags')->willReturn([]);
         $this->state->expects($this->any())->method('getEvents')->willReturn([]);
+        $this->state->expects($this->any())->method('getAttributes')->willReturn($attributes);
 
         $this->process->expects($this->any())->method('getName')->willReturn('processName');
 
@@ -63,13 +66,17 @@ class DocumentBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testDotFormatWithEvent()
     {
+        $attributes = $this->getMock('\StateMachine\AttributeCollectionInterface');
+
         $event = $this->getMockBuilder('\StateMachine\EventInterface')->disableOriginalConstructor()->getMock();
         $event->expects($this->any())->method('getName')->willReturn('eventName');
         $event->expects($this->any())->method('getStates')->willReturn(['target' => 'targetState', 'error' => 'errorState']);
+        $event->expects($this->any())->method('getAttributes')->willReturn($attributes);
 
         $this->state->expects($this->any())->method('getName')->willReturn('name');
         $this->state->expects($this->any())->method('getFlags')->willReturn([]);
         $this->state->expects($this->any())->method('getEvents')->willReturn([$event]);
+        $this->state->expects($this->any())->method('getAttributes')->willReturn($attributes);
 
         $this->process->expects($this->any())->method('getName')->willReturn('processName');
 

@@ -49,11 +49,11 @@ interface EventInterface
     public function getStates();
 
     /**
-     * Return comment
+     * Return attributes container
      *
-     * @return string
+     * @return AttributeCollectionInterface
      */
-    public function getComment();
+    public function getAttributes();
 
     /**
      * Return true if event has timeout

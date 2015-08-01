@@ -67,11 +67,11 @@ interface StateInterface
     public function getEvent($name);
 
     /**
-     * Return comment
+     * Return attributes container
      *
-     * @return string
+     * @return AttributeCollectionInterface
      */
-    public function getComment();
+    public function getAttributes();
 
     /**
      * Triggers event with given name and payload

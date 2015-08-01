@@ -143,10 +143,10 @@ class StateTest extends \PHPUnit_Framework_TestCase
         $state->getFlag('undefinedFlag');
     }
 
-    public function testComment()
+    public function testAttributes()
     {
-        $state = new State('stateName', [], [], 'Lorem ipsum');
-        $this->assertEquals('Lorem ipsum', $state->getComment());
+        $state = new State('stateName', [], [], []);
+        $this->assertInstanceOf('\StateMachine\AttributeCollectionInterface', $state->getAttributes());
     }
 
     /**

@@ -76,7 +76,7 @@ class DocumentBuilder
                 $state->getName(),
                 $state->getFlags(),
                 $this->stylist->getStyle('state', $state->getName()),
-                $state->getComment()
+                $state->getAttributes()->get('comment')
             )
         );
     }
@@ -113,7 +113,7 @@ class DocumentBuilder
             $nextState,
             $event->getName(),
             $style,
-            $event->getComment(),
+            $event->getAttributes()->get('comment'),
             $event->getTimeout()
         );
     }

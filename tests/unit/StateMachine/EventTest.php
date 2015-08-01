@@ -66,10 +66,10 @@ class EventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $event->getStates());
     }
 
-    public function testComment()
+    public function testAttributes()
     {
-        $event = new Event('eventName', null, 'errorState', null, null, 'Lorem ipsum');
-        $this->assertEquals('Lorem ipsum', $event->getComment());
+        $event = new Event('eventName', null, 'errorState', null, null, []);
+        $this->assertInstanceOf('\StateMachine\AttributeCollectionInterface', $event->getAttributes());
     }
 
     public function testHasTimeout()

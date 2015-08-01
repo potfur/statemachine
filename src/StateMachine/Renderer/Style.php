@@ -99,6 +99,4 @@ class Style
     {
         return $this->style;
     }
-
-
 }

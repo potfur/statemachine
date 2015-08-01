@@ -94,7 +94,7 @@ class ArrayAdapter implements AdapterInterface
                 $this->getOffsetFromArray($state, 'name'),
                 $this->buildEvents($state),
                 $this->buildFlags($state),
-                $this->getOffsetFromArray($state, 'comment')
+                $this->getAdditionalFromArray($state, ['events', 'name', 'flags'])
             );
         }
 
@@ -135,7 +135,7 @@ class ArrayAdapter implements AdapterInterface
                 $this->getOffsetFromArray($event, 'errorState'),
                 $this->buildCommands($event),
                 $this->buildTimeout($this->getOffsetFromArray($event, 'timeout')),
-                $this->getOffsetFromArray($event, 'comment')
+                $this->getAdditionalFromArray($event, ['name', 'commands', 'targetState', 'errorState', 'timeout'])
             );
         }
 
@@ -145,7 +145,7 @@ class ArrayAdapter implements AdapterInterface
     /**
      * Build timeout
      *
-     * @param mixed  $timeout
+     * @param mixed $timeout
      *
      * @return Timeout|null
      */
@@ -208,5 +208,24 @@ class ArrayAdapter implements AdapterInterface
     private function getOffsetFromArray(array $array, $offset, $default = null)
     {
         return array_key_exists($offset, $array) ? $array[$offset] : $default;
+    }
+
+    /**
+     * Return array elements not matching keys
+     *
+     * @param array $array
+     * @param array $ignoredKeys
+     *
+     * @return array
+     */
+    private function getAdditionalFromArray(array $array, array $ignoredKeys)
+    {
+        return array_filter(
+            $array,
+            function ($key) use ($ignoredKeys) {
+                return !in_array($key, $ignoredKeys);
+            },
+            \ARRAY_FILTER_USE_KEY
+        );
     }
 }

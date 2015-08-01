@@ -98,7 +98,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
                             'error',
                             new CommandCollection([$command]),
                             null,
-                            'comment'
+                            ['comment' => 'comment']
                         ),
                         new Event(
                             'eventB',
@@ -106,13 +106,13 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
                             'error',
                             new CommandCollection(),
                             new Timeout(new \DateInterval('PT10S')),
-                            'comment'
+                            ['comment' => 'comment']
                         )
                     ],
                     [
                         new Flag('hasFlag', true)
                     ],
-                    'comment'
+                    ['comment' => 'comment']
                 )
             ]
         );
