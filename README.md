@@ -4,6 +4,7 @@
 [![Code Coverage](https://scrutinizer-ci.com/g/potfur/statemachine/badges/coverage.png?b=dev)](https://scrutinizer-ci.com/g/potfur/statemachine/?branch=dev)
 [![Build Status](https://scrutinizer-ci.com/g/potfur/statemachine/badges/build.png?b=dev)](https://scrutinizer-ci.com/g/potfur/statemachine/build-status/dev)
 [![License](https://poser.pugx.org/potfur/statemachine/license.svg)](https://packagist.org/packages/potfur/statemachine)
+[![Latest Stable Version](https://poser.pugx.org/potfur/statemachine/v/stable.svg)](https://packagist.org/packages/potfur/statemachine) 
 
 StateMachine is an implementation of _non-deterministic finite automata_ (this can be also subsumed under _state pattern_ implementation).
 In different words - machine will move _context_ from one state to another, depending on result of executed _commands_.
