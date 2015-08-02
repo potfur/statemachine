@@ -21,21 +21,29 @@ class StateMachine
     const LOCK_TIMEOUT_INTERVAL = 'PT1H';
 
     /**
+     * Schema adapter
+     *
      * @var AdapterInterface
      */
     private $adapter;
 
     /**
+     * Handler for payload storing/restoring
+     *
      * @var PayloadHandlerInterface
      */
     private $payloadHandler;
 
     /**
+     * Handler for timeouts
+     *
      * @var TimeoutHandlerInterface
      */
     private $timeoutHandler;
 
     /**
+     * Handler for concurrent runs
+     *
      * @var LockHandlerInterface
      */
     private $lockHandler;
@@ -46,7 +54,7 @@ class StateMachine
      * @param AdapterInterface        $adapter
      * @param PayloadHandlerInterface $payloadHandler
      * @param TimeoutHandlerInterface $timeoutHandler
-     * @param LockHandlerInterface    $lockHandler
+     * @param LockHandlerInterface    $lockHandler handler for concurrent runs
      */
     public function __construct(AdapterInterface $adapter, PayloadHandlerInterface $payloadHandler, TimeoutHandlerInterface $timeoutHandler, LockHandlerInterface $lockHandler)
     {
@@ -104,12 +112,13 @@ class StateMachine
 
     /**
      * Resolve single timeout
+
      *
-     * @param ProcessInterface $process
-     * @param Timeout          $timeout
+*@param ProcessInterface $process
+     * @param PayloadTimeout          $timeout
      * @param  array           $result
      */
-    private function resolveTimeout(ProcessInterface $process, Timeout $timeout, &$result)
+    private function resolveTimeout(ProcessInterface $process, PayloadTimeout $timeout, &$result)
     {
         if ($this->lockHandler->isLocked($timeout->getIdentifier())) {
             return;

@@ -18,14 +18,25 @@ namespace StateMachine;
  */
 final class CommandCollection implements \Countable
 {
+    /**
+     * Commands that will be executed
+     *
+     * @var callable[]
+     */
     private $commands = [];
+
+    /**
+     * Execution results
+     *
+     * @var bool[]
+     */
     private $status = [];
 
     /**
      * Constructor
      * Builds command collection from passed array
      *
-     * @param callable[] $commands
+     * @param callable[] $commands array with commands
      *
      * @throws \Exception
      */

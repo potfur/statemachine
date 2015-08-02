@@ -24,9 +24,4 @@ Cons:
  - can lead to code duplication
  - _context_ can end in undefined (eg. removed) _state_
 
-## Next steps
- - locks for concurrent runs - **done**
- - factory for different schemas
- - PSR3 LoggerAwareInterface
-
-![](https://github.com/potfur/statemachine/wiki/schema.png)
+![](https://github.com/potfur/statemachine/wiki/schema_integration.png)

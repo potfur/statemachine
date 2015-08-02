@@ -143,6 +143,12 @@ class StateTest extends \PHPUnit_Framework_TestCase
         $state->getFlag('undefinedFlag');
     }
 
+    public function testAttributes()
+    {
+        $state = new State('stateName', [], [], []);
+        $this->assertInstanceOf('\StateMachine\AttributeCollectionInterface', $state->getAttributes());
+    }
+
     /**
      * @dataProvider triggerEventProvider
      */

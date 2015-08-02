@@ -16,32 +16,40 @@ final class Process implements ProcessInterface
     use GetTypeTrait;
 
     const ON_STATE_WAS_SET = 'onStateWasSet';
-    const ON_TIME_OUT = 'onTimeOut';
+    const ON_TIME_OUT = 'onTimeout';
 
     /**
+     * Process/schema name
+     *
      * @var string
      */
     private $name;
 
     /**
+     * Context class
+     *
      * @var string
      */
     private $subjectClass;
 
     /**
+     * Initial state
+     *
      * @var string
      */
     private $initialState;
 
     /**
+     * Schema states
+     *
      * @var GenericCollection|StateInterface[]
      */
     private $states = [];
 
     /**
-     * @param string           $name
-     * @param string           $subjectClass
-     * @param string           $initialState
+     * @param string           $name         process/schema name
+     * @param string           $subjectClass context class name
+     * @param string           $initialState initial state for entities starting process
      * @param StateInterface[] $states
      *
      * @throws InvalidStateException
@@ -185,7 +193,7 @@ final class Process implements ProcessInterface
      * @param StateInterface   $state
      * @param PayloadInterface $payload
      *
-     * @return null|StateInterface
+     * @return StateInterface|null
      */
     private function handleOnStateWasSet(StateInterface $state, PayloadInterface $payload)
     {
@@ -232,13 +240,18 @@ final class Process implements ProcessInterface
      * @param PayloadInterface $payload
      * @param \DateTime        $now date will be used as reference for timeouts defined as intervals
      *
-     * @return Timeout
+     * @return PayloadTimeout
      */
     public function getTimeout(PayloadInterface $payload, \DateTime $now)
     {
         $state = $this->getState($payload->getState());
         $event = $state->getEvent(self::ON_TIME_OUT);
 
-        return new Timeout($state->getName(), self::ON_TIME_OUT, $payload->getIdentifier(), $event->getTimeout($now));
+        return new PayloadTimeout(
+            $state->getName(),
+            $event->getName(),
+            $payload->getIdentifier(),
+            $event->timeoutAt($now)
+        );
     }
 }

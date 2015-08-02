@@ -11,8 +11,6 @@
 
 namespace StateMachine;
 
-use StateMachine\Exception\InvalidArgumentException;
-
 /**
  * Interface for events
  *
@@ -44,6 +42,20 @@ interface EventInterface
     public function getErrorState();
 
     /**
+     * Return list of transition types with target states
+     *
+     * @return array
+     */
+    public function getStates();
+
+    /**
+     * Return attributes container
+     *
+     * @return AttributeCollectionInterface
+     */
+    public function getAttributes();
+
+    /**
      * Return true if event has timeout
      *
      * @return bool
@@ -51,13 +63,20 @@ interface EventInterface
     public function hasTimeout();
 
     /**
-     * Return when event timeout
+     * Return timeout value
+     *
+     * @return Timeout|null
+     */
+    public function getTimeout();
+
+    /**
+     * Return date when event timeout
      *
      * @param \DateTime $now date will be used as reference for timeouts defined as intervals
      *
      * @return \DateTime
      */
-    public function getTimeout(\DateTime $now);
+    public function timeoutAt(\DateTime $now);
 
     /**
      * Triggers event and return next state name or null if there is no state change

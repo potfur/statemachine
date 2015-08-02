@@ -20,28 +20,48 @@ use StateMachine\Flag;
  */
 class Node implements DotInterface
 {
+    /**
+     * State name
+     *
+     * @var string
+     */
     private $state;
+
+    /**
+     * State flags
+     *
+     * @var array|\StateMachine\Flag[]
+     */
     private $flags;
-    private $fillColor;
-    private $textColor;
-    private $flagColor;
+
+    /**
+     * Description
+     *
+     * @var string
+     */
+    private $comment;
+
+    /**
+     * Style
+     *
+     * @var Style
+     */
+    private $style;
 
     /**
      * Build edge/path between two nodes in dot format
      *
-     * @param string $state
-     * @param Flag[] $flags
-     * @param string $fillColor
-     * @param string $textColor
-     * @param string $flagColor
+     * @param string $state   state name
+     * @param Flag[] $flags   array with flags
+     * @param string $comment description
+     * @param Style  $style   style
      */
-    public function __construct($state, array $flags, $fillColor, $textColor, $flagColor)
+    public function __construct($state, array $flags, Style $style, $comment = null)
     {
         $this->state = $state;
         $this->flags = $flags;
-        $this->fillColor = $fillColor;
-        $this->textColor = $textColor;
-        $this->flagColor = $flagColor;
+        $this->comment = $comment;
+        $this->style = $style;
     }
 
     /**
@@ -52,11 +72,13 @@ class Node implements DotInterface
     public function __toString()
     {
         return sprintf(
-            'node[label=<%1$s%2$s>,height="0.6",shape="ellipse",style="filled",color="transparent",fillcolor="%3$s",fontcolor="%4$s"]{ state_%1$s };',
+            'node[label=<%1$s%2$s>,tooltip="%6$s",height="0.6",shape="%5$s",style="filled",color="transparent",fillcolor="%3$s",fontcolor="%4$s"]{ state_%1$s };',
             $this->state,
-            $this->buildFlags($this->flags, $this->flagColor),
-            $this->fillColor,
-            $this->textColor
+            $this->buildFlags($this->flags, $this->style->getAltColor()),
+            $this->style->getColor(),
+            $this->style->getText(),
+            $this->style->getStyle(),
+            $this->comment
         );
     }
 

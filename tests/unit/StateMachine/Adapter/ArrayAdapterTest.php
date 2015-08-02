@@ -17,6 +17,7 @@ use StateMachine\Event;
 use StateMachine\Flag;
 use StateMachine\Process;
 use StateMachine\State;
+use StateMachine\Timeout;
 
 class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
 {
@@ -46,7 +47,9 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
 
     public function testGetProcess()
     {
-        $command = function () { };
+        $command = function () {
+            // NOP
+        };
 
         $schema = [
             'name' => 'testSchema',
@@ -55,17 +58,26 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
             'states' => [
                 [
                     'name' => 'testState',
+                    'comment' => 'comment',
                     'flags' => [
                         'hasFlag' => true
                     ],
                     'events' => [
                         [
-                            'name' => 'eventName',
+                            'name' => 'eventA',
+                            'comment' => 'comment',
                             'targetState' => 'pending',
                             'errorState' => 'error',
                             'commands' => [
                                 $command
                             ]
+                        ],
+                        [
+                            'name' => 'eventB',
+                            'comment' => 'comment',
+                            'targetState' => 'pending',
+                            'errorState' => 'error',
+                            'timeout' => new \DateInterval('PT10S'),
                         ]
                     ],
                 ]
@@ -81,13 +93,26 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
                     'testState',
                     [
                         new Event(
-                            'eventName',
+                            'eventA',
                             'pending',
                             'error',
-                            new CommandCollection([$command])
+                            new CommandCollection([$command]),
+                            null,
+                            ['comment' => 'comment']
+                        ),
+                        new Event(
+                            'eventB',
+                            'pending',
+                            'error',
+                            new CommandCollection(),
+                            new Timeout(new \DateInterval('PT10S')),
+                            ['comment' => 'comment']
                         )
                     ],
-                    [new Flag('hasFlag', true)]
+                    [
+                        new Flag('hasFlag', true)
+                    ],
+                    ['comment' => 'comment']
                 )
             ]
         );

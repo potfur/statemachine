@@ -67,6 +67,13 @@ interface StateInterface
     public function getEvent($name);
 
     /**
+     * Return attributes container
+     *
+     * @return AttributeCollectionInterface
+     */
+    public function getAttributes();
+
+    /**
      * Triggers event with given name and payload
      * Returns name of next state or null if no change
      *

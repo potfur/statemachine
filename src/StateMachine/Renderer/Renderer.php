@@ -11,9 +11,7 @@
 
 namespace StateMachine\Renderer;
 
-use StateMachine\AdapterInterface;
-use StateMachine\EventInterface;
-use StateMachine\StateInterface;
+use StateMachine\Exception\GraphvizException;
 
 /**
  * State machine process renderer
@@ -22,80 +20,34 @@ use StateMachine\StateInterface;
  */
 class Renderer
 {
-    private $dpi;
-    private $font;
-    private $colors = [
-        'state' => ['text' => '#444444', 'color' => '#ebebeb', 'flag' => '#0066aa'],
-        'target' => ['text' => '#999999', 'color' => '#99BB11'],
-        'error' => ['text' => '#999999', 'color' => '#ee1155']
-    ];
-
     /**
-     * @var AdapterInterface
+     * Path to graphviz executable
+     *
+     * @var string
      */
-    private $adapter;
-
     private $executable;
 
     /**
-     * @param AdapterInterface $adapter
-     * @param string           $executable path to dot executable
-     * @param int              $dpi        resolution
-     * @param string           $font       font used for labels
-     * @param array            $colors     colors used for states and edges
+     * @param string $executable path to dot executable
      */
-    public function __construct(AdapterInterface $adapter, $executable, $dpi = 75, $font = 'Courier', $colors = [])
+    public function __construct($executable)
     {
-        $this->adapter = $adapter;
         $this->executable = $executable;
-
-        $this->dpi = (int) $dpi;
-        $this->font = $font;
-
-        $this->setColors($colors);
     }
 
     /**
-     * Set colors used for states and edges
-     * Passed array is merged with array just like that from getColors
-     *
-     * @param array $colors
-     */
-    public function setColors(array $colors)
-    {
-        foreach (array_keys($this->colors) as $node) {
-            if (isset($colors[$node])) {
-                $this->colors[$node] = array_merge($this->colors[$node], $colors[$node]);
-            }
-        }
-    }
-
-    /**
-     * Return array with colors used for states and edges
-     *
-     * @return array
-     */
-    public function getColors()
-    {
-        return $this->colors;
-    }
-
-    /**
-     * Render process as png
+     * Render process in dot document as png
      * Return path to output file
      * If output file exists, will be overwritten
      *
-     * @param string $outputFile
+     * @param Document $document
+     * @param string   $outputFile
      *
      * @return string
      */
-    public function png($outputFile)
+    public function png(Document $document, $outputFile)
     {
-        $tempFile = $this->buildDotFile();
-
-        shell_exec(sprintf('%s -Tpng %s -o%s', $this->executable, $tempFile, $outputFile));
-
-        return $outputFile;
+        return $this->exec($document, $outputFile, 'png');
     }
 
     /**
@@ -103,114 +55,59 @@ class Renderer
      * Return path to output file
      * If output file exists, will be overwritten
      *
-     * @param string $outputFile
+     * @param Document $document
+     * @param string   $outputFile
      *
      * @return string
      */
-    public function svg($outputFile)
+    public function svg(Document $document, $outputFile)
     {
-        $tempFile = $this->buildDotFile();
-
-        shell_exec(sprintf('%s -Tsvg %s -o%s', $this->executable, $tempFile, $outputFile));
-
-        return $outputFile;
+        return $this->exec($document, $outputFile, 'svg');
     }
 
     /**
-     * Build process structure in dot format
+     * Execute system call to Graphviz
      * Return path to output file
-     * If output file exists, will be overwritten
      *
-     * @param string $outputFile
+     * @param Document $document
+     * @param string   $outputFile
+     * @param string   $format
      *
      * @return string
+     * @throws GraphvizException
      */
-    public function dot($outputFile)
+    private function exec(Document $document, $outputFile, $format)
     {
-        $document = new Document(
-            $this->adapter->getProcess()->getName(),
-            $this->dpi,
-            $this->font
+        $tempFile = $this->buildDotFile($document);
+
+        $output = [];
+        $status = 0;
+
+        exec(
+            sprintf('%s -T%s %s -o%s', $this->executable, $format, $tempFile, $outputFile),
+            $output,
+            $status
         );
 
-        foreach ($this->adapter->getProcess()->getStates() as $state) {
-            $this->addState($document, $state);
-
-            foreach ($state->getEvents() as $event) {
-                $this->addEvent($document, $state, $event);
-            }
+        if ($status !== 0) {
+            throw new GraphvizException('Unable to render graph from dot file', $status);
         }
-
-        file_put_contents($outputFile, (string) $document);
 
         return $outputFile;
-    }
-
-    /**
-     * Create state for dot notation
-     *
-     * @param Document       $document
-     * @param StateInterface $state
-     */
-    private function addState(Document $document, StateInterface $state)
-    {
-        $document->addState(
-            new Node(
-                $state->getName(),
-                $state->getFlags(),
-                $this->colors['state']['color'],
-                $this->colors['state']['text'],
-                $this->colors['state']['flag']
-            )
-        );
-    }
-
-    /**
-     * Create edge for dot notation
-     *
-     * @param Document       $document
-     * @param StateInterface $state
-     * @param EventInterface $event
-     */
-    private function addEvent(Document $document, StateInterface $state, EventInterface $event)
-    {
-        if ($event->getTargetState()) {
-            $document->addEdge($this->createEdge($state, $event, $event->getTargetState(), $this->colors['target']));
-        }
-
-        if ($event->getErrorState()) {
-            $document->addEdge($this->createEdge($state, $event, $event->getErrorState(), $this->colors['error']));
-        }
-    }
-
-    /**
-     * Create edge for dot notation
-     *
-     * @param StateInterface $state
-     * @param EventInterface $event
-     * @param string         $nextState
-     * @param array          $colors
-     *
-     * @return Edge
-     */
-    private function createEdge(StateInterface $state, EventInterface $event, $nextState, $colors)
-    {
-        return new Edge(
-            $state->getName(),
-            $nextState,
-            $event->getName(),
-            $colors['color'],
-            $colors['text']
-        );
     }
 
     /**
      * Create file with dot schema
      *
+     * @param Document $document
+     *
      * @return string
      */
-    private function buildDotFile()
+    private function buildDotFile(Document $document)
     {
-        return $this->dot(tempnam(sys_get_temp_dir(), 'smr'));
+        $tmpname = tempnam(sys_get_temp_dir(), 'smr');
+        file_put_contents($tmpname, (string) $document);
+
+        return $tmpname;
     }
 }

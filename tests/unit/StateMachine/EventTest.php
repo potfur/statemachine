@@ -55,42 +55,47 @@ class EventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('errorState', $event->getErrorState());
     }
 
-    /**
-     * @dataProvider timeoutProvider
-     */
-    public function testHasTimeout($timeout)
+    public function testStates()
     {
-        $event = new Event('eventName', null, null, null, $timeout);
-        $this->assertEquals($timeout !== null, $event->hasTimeout());
-    }
-
-    /**
-     * @dataProvider timeoutProvider
-     */
-    public function testGetTimeout($timeout, $expected)
-    {
-        $now = new \DateTime('2015-03-31 10:10:10');
-
-        $event = new Event('eventName', null, null, null, $timeout);
-        $this->assertEquals($expected, $event->getTimeout($now));
-    }
-
-    public function timeoutProvider()
-    {
-        return [
-            [new \DateTime('2015-04-01 10:10:10'), new \DateTime('2015-04-01 10:10:10')],
-            [new \DateInterval('PT60S'), new \DateTime('2015-03-31 10:11:10')],
-            [null, new \DateTime('2015-03-31 10:10:10')],
+        $expected = [
+            'target' => 'targetState',
+            'error' => 'errorState'
         ];
+
+        $event = new Event('eventName', 'targetState', 'errorState');
+        $this->assertEquals($expected, $event->getStates());
     }
 
-    /**
-     * @expectedException \StateMachine\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid timeout value, must be instance of \DateInterval for relative timeout, \DateTime for fixed date or null when without timeout
-     */
-    public function testInvalidTimeout()
+    public function testAttributes()
     {
-        new Event('eventName', null, null, null, 'foobar');
+        $event = new Event('eventName', null, 'errorState', null, null, []);
+        $this->assertInstanceOf('\StateMachine\AttributeCollectionInterface', $event->getAttributes());
+    }
+
+    public function testHasTimeout()
+    {
+        $timeout = new Timeout('PT1S');
+
+        $event = new Event('eventName', null, null, null, $timeout);
+        $this->assertEquals(true, $event->hasTimeout());
+    }
+
+    public function testGetTimeout()
+    {
+        $timeout = new Timeout('PT1S');
+
+        $event = new Event('eventName', null, null, null, $timeout);
+        $this->assertEquals($timeout, $event->getTimeout());
+    }
+
+    public function testTimeoutAt()
+    {
+        $timeout = new Timeout('PT1S');
+        $now = new \DateTime('2015-03-31 10:10:10');
+        $expected = new \DateTime('2015-03-31 10:10:11');
+
+        $event = new Event('eventName', null, null, null, new Timeout($timeout));
+        $this->assertEquals($expected, $event->timeoutAt($now));
     }
 
     /**
@@ -99,7 +104,6 @@ class EventTest extends \PHPUnit_Framework_TestCase
     public function testTrigger($targetState, $errorState, $result, $expected)
     {
         $payload = $this->getMock('\StateMachine\PayloadInterface');
-
 
         $commands = new CommandCollection([new CommandMock($result)]);
 

@@ -65,7 +65,7 @@ interface ProcessInterface
      * @param PayloadInterface $payload
      * @param \DateTime        $now date will be used as reference for timeouts defined as intervals
      *
-     * @return Timeout
+     * @return PayloadTimeout
      */
     public function getTimeout(PayloadInterface $payload, \DateTime $now);
 }

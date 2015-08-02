@@ -18,6 +18,7 @@ use StateMachine\EventInterface;
 use StateMachine\Flag;
 use StateMachine\Process;
 use StateMachine\State;
+use StateMachine\Timeout;
 
 /**
  * Adapter for array schemas
@@ -26,7 +27,18 @@ use StateMachine\State;
  */
 class ArrayAdapter implements AdapterInterface
 {
+    /**
+     * Schema array
+     *
+     * @var array
+     */
     private $schema;
+
+    /**
+     * Resolved process instance
+     *
+     * @var Process
+     */
     private $process;
 
     /**
@@ -81,7 +93,8 @@ class ArrayAdapter implements AdapterInterface
             $states[] = new State(
                 $this->getOffsetFromArray($state, 'name'),
                 $this->buildEvents($state),
-                $this->buildFlags($state)
+                $this->buildFlags($state),
+                $this->getAdditionalFromArray($state, ['events', 'name', 'flags'])
             );
         }
 
@@ -112,7 +125,7 @@ class ArrayAdapter implements AdapterInterface
      *
      * @return EventInterface[]
      */
-    private function buildEvents($state)
+    private function buildEvents(array $state)
     {
         $events = [];
         foreach ($this->getOffsetFromArray($state, 'events', []) as $event) {
@@ -121,11 +134,28 @@ class ArrayAdapter implements AdapterInterface
                 $this->getOffsetFromArray($event, 'targetState'),
                 $this->getOffsetFromArray($event, 'errorState'),
                 $this->buildCommands($event),
-                $this->getOffsetFromArray($event, 'timeout')
+                $this->buildTimeout($this->getOffsetFromArray($event, 'timeout')),
+                $this->getAdditionalFromArray($event, ['name', 'commands', 'targetState', 'errorState', 'timeout'])
             );
         }
 
         return $events;
+    }
+
+    /**
+     * Build timeout
+     *
+     * @param mixed $timeout
+     *
+     * @return Timeout|null
+     */
+    private function buildTimeout($timeout)
+    {
+        if ($timeout === null) {
+            return null;
+        }
+
+        return new Timeout($timeout);
     }
 
     /**
@@ -178,5 +208,18 @@ class ArrayAdapter implements AdapterInterface
     private function getOffsetFromArray(array $array, $offset, $default = null)
     {
         return array_key_exists($offset, $array) ? $array[$offset] : $default;
+    }
+
+    /**
+     * Return array elements not matching keys
+     *
+     * @param array $array
+     * @param array $ignoredKeys
+     *
+     * @return array
+     */
+    private function getAdditionalFromArray(array $array, array $ignoredKeys)
+    {
+        return array_intersect_key($array, array_diff_key($array, array_flip($ignoredKeys)));
     }
 }

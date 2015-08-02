@@ -235,7 +235,8 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $date = new \DateTime();
 
         $event = $this->getMockBuilder('\StateMachine\EventInterface')->disableOriginalConstructor()->getMock();
-        $event->expects($this->any())->method('getTimeout')->willReturn($date);
+        $event->expects($this->any())->method('getName')->willReturn(Process::ON_TIME_OUT);
+        $event->expects($this->any())->method('timeoutAt')->willReturn($date);
 
         $this->state->expects($this->any())->method('__toString')->willReturn('stateName');
         $this->state->expects($this->any())->method('getName')->willReturn('stateName');
@@ -247,7 +248,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $process = new Process('processName', '\stdClass', 'stateName', [$this->state]);
         $timeout = $process->getTimeout($this->payload, $date);
 
-        $this->assertInstanceOf('\StateMachine\Timeout', $timeout);
+        $this->assertInstanceOf('\StateMachine\PayloadTimeout', $timeout);
 
         $this->assertEquals('stateName', $timeout->getState());
         $this->assertEquals(Process::ON_TIME_OUT, $timeout->getEvent());

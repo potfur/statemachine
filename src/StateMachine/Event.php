@@ -49,31 +49,39 @@ final class Event implements EventInterface
     private $commands;
 
     /**
-     * Timeout as fixed date or relative interval
+     * Timeout
      *
-     * @var \DateInterval|\DateTime
+     * @var Timeout|null
      */
     private $timeout;
 
     /**
+     * Additional comment
+     *
+     * @var AttributeCollectionInterface
+     */
+    private $attributes;
+
+    /**
      * Constructor
      *
-     * @param string                       $name        event name
-     * @param string                       $targetState state where subject will go when all commands were executed successfully
-     * @param string                       $errorState  state where subject will go when command execution failed
-     * @param CommandCollection            $commands    collection of commands
-     * @param null|\DateInterval|\DateTime $timeout     date or interval when event should timeout
+     * @param string            $name        event name
+     * @param string            $targetState state where subject will go when all commands were executed successfully
+     * @param string            $errorState  state where subject will go when command execution failed
+     * @param CommandCollection $commands    collection of commands
+     * @param Timeout|null      $timeout     date or interval when event should timeout
+     * @param array             $attributes  additional attributes, like comment etc.
      */
-    public function __construct($name, $targetState = null, $errorState = null, CommandCollection $commands = null, $timeout = null)
+    public function __construct($name, $targetState = null, $errorState = null, CommandCollection $commands = null, Timeout $timeout = null, array $attributes = [])
     {
         $this->assertName($name);
-        $this->assertTimeout($timeout);
 
         $this->name = $name;
         $this->targetState = $targetState;
         $this->errorState = $errorState;
         $this->commands = $commands;
         $this->timeout = $timeout;
+        $this->attributes = new AttributeCollection($attributes);
     }
 
     /**
@@ -87,20 +95,6 @@ final class Event implements EventInterface
     {
         if (empty($name)) {
             throw new InvalidArgumentException('Invalid event name, can not be empty string');
-        }
-    }
-
-    /**
-     * Assert if timeout is \DateInterval, \DateTime or null
-     *
-     * @param null|\DateInterval|\DateTime $timeout
-     *
-     * @throws InvalidArgumentException
-     */
-    private function assertTimeout($timeout)
-    {
-        if ($timeout !== null && !$timeout instanceof \DateInterval && !$timeout instanceof \DateTime) {
-            throw new InvalidArgumentException('Invalid timeout value, must be instance of \DateInterval for relative timeout, \DateTime for fixed date or null when without timeout');
         }
     }
 
@@ -137,6 +131,30 @@ final class Event implements EventInterface
     }
 
     /**
+     * Return list of transition types with target states
+     *
+     * @return array
+     */
+    public function getStates()
+    {
+        return [
+            'target' => $this->targetState,
+            'error' => $this->errorState
+        ];
+    }
+
+    /**
+     * Return attributes container
+
+     *
+*@return AttributeCollectionInterface
+     */
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+
+    /**
      * Return true if event has timeout
      *
      * @return bool
@@ -147,23 +165,25 @@ final class Event implements EventInterface
     }
 
     /**
+     * Return timeout value
+     *
+     * @return Timeout|null
+     */
+    public function getTimeout()
+    {
+        return $this->timeout;
+    }
+
+    /**
      * Return when event timeout
      *
      * @param \DateTime $now date will be used as reference for timeouts defined as intervals
      *
      * @return \DateTime
      */
-    public function getTimeout(\DateTime $now)
+    public function timeoutAt(\DateTime $now)
     {
-        if ($this->timeout instanceof \DateTime) {
-            return $this->timeout;
-        }
-
-        if ($this->timeout instanceof \DateInterval) {
-            return $now->add($this->timeout);
-        }
-
-        return $now;
+        return $this->timeout->timeoutAt($now);
     }
 
     /**

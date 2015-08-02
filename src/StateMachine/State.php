@@ -12,32 +12,48 @@ use StateMachine\Exception\InvalidArgumentException;
 final class State implements StateInterface
 {
     /**
+     * State name
+     *
      * @var string
      */
     private $name;
 
     /**
-     * @var GenericCollection|EventInterface[]
+     * State events
+     *
+     * @var GenericCollection
      */
     private $events;
 
     /**
-     * @var GenericCollection|Flag[]
+     * State flags
+     *
+     * @var GenericCollection
      */
     private $flags;
 
     /**
-     * @param string  $name
-     * @param EventInterface[] $events
-     * @param Flag[]  $flags
+     * Additional attributes
+
+     *
+*@var AttributeCollectionInterface
      */
-    public function __construct($name, array $events = [], array $flags = [])
+    private $attributes;
+
+    /**
+     * @param string           $name state name
+     * @param EventInterface[] $events list of events in state
+     * @param Flag[]           $flags array with state flags
+     * @param array           $attributes additional attributes like comment etc.
+     */
+    public function __construct($name, array $events = [], array $flags = [], array $attributes = [])
     {
         $this->assertName($name);
 
         $this->name = $name;
         $this->events = new GenericCollection($events, '\StateMachine\EventInterface');
         $this->flags = new GenericCollection($flags, '\StateMachine\Flag');
+        $this->attributes = new AttributeCollection($attributes);
     }
 
     /**
@@ -130,6 +146,17 @@ final class State implements StateInterface
     public function getEvent($name)
     {
         return $this->events->get($name);
+    }
+
+    /**
+     * Return attributes container
+
+     *
+*@return AttributeCollectionInterface
+     */
+    public function getAttributes()
+    {
+        return $this->attributes;
     }
 
     /**
