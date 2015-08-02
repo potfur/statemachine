@@ -24,4 +24,4 @@ Cons:
  - can lead to code duplication
  - _context_ can end in undefined (eg. removed) _state_
 
-![](https://github.com/potfur/statemachine/wiki/schema.png)
+![](https://github.com/potfur/statemachine/wiki/schema_integration.png)
