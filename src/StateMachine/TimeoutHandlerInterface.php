@@ -20,25 +20,22 @@ interface TimeoutHandlerInterface
 {
     /**
      * Return list of timeouts that need to be run
-
      *
-*@return PayloadTimeout[]
+     * @return PayloadTimeout[]
      */
     public function getExpired();
 
     /**
      * Remove timeout
-
      *
-*@param PayloadTimeout $timeout
+     * @param PayloadTimeout $timeout
      */
     public function remove(PayloadTimeout $timeout);
 
     /**
      * Creates timeout
-
      *
-*@param PayloadTimeout $timeout
+     * @param PayloadTimeout $timeout
      */
     public function store(PayloadTimeout $timeout);
 }

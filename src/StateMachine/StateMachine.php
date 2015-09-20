@@ -11,6 +11,8 @@
 
 namespace StateMachine;
 
+use StateMachine\Exception\InvalidStateException;
+
 /**
  * State machine
  *
@@ -56,8 +58,12 @@ class StateMachine
      * @param TimeoutHandlerInterface $timeoutHandler
      * @param LockHandlerInterface    $lockHandler handler for concurrent runs
      */
-    public function __construct(AdapterInterface $adapter, PayloadHandlerInterface $payloadHandler, TimeoutHandlerInterface $timeoutHandler, LockHandlerInterface $lockHandler)
-    {
+    public function __construct(
+        AdapterInterface $adapter,
+        PayloadHandlerInterface $payloadHandler,
+        TimeoutHandlerInterface $timeoutHandler,
+        LockHandlerInterface $lockHandler
+    ) {
         $this->adapter = $adapter;
         $this->payloadHandler = $payloadHandler;
         $this->timeoutHandler = $timeoutHandler;
@@ -104,7 +110,11 @@ class StateMachine
         $timeouts = $this->timeoutHandler->getExpired();
 
         foreach ($timeouts as $timeout) {
-            $this->resolveTimeout($process, $timeout, $result);
+            if ($this->lockHandler->isLocked($timeout->getIdentifier())) {
+                return null;
+            }
+
+            $result[$timeout->getIdentifier()] = $this->resolveTimeout($process, $timeout);
         }
 
         return $result;
@@ -112,27 +122,34 @@ class StateMachine
 
     /**
      * Resolve single timeout
-
      *
-*@param ProcessInterface $process
-     * @param PayloadTimeout          $timeout
-     * @param  array           $result
+     * @param ProcessInterface $process
+     * @param PayloadTimeout   $timeout
+     *
+     * @return array
+     * @throws InvalidStateException
      */
-    private function resolveTimeout(ProcessInterface $process, PayloadTimeout $timeout, &$result)
+    private function resolveTimeout(ProcessInterface $process, PayloadTimeout $timeout)
     {
-        if ($this->lockHandler->isLocked($timeout->getIdentifier())) {
-            return;
-        }
-
         $this->lockHandler->lock($timeout->getIdentifier());
         $payload = $this->payloadHandler->restore($timeout->getIdentifier());
 
-        if ($payload->getState() === $timeout->getState()) {
-            $result[$timeout->getIdentifier()] = $this->resolveEvent($process, $payload, $timeout->getEvent());
+        if ($payload->getState() !== $timeout->getState()) {
+            throw new InvalidStateException(
+                sprintf(
+                    'Payload is in different state, expected "%s" but is "%s" ',
+                    $timeout->getState(),
+                    $payload->getState()
+                )
+            );
         }
+
+        $result = $this->resolveEvent($process, $payload, $timeout->getEvent());
 
         $this->timeoutHandler->remove($timeout);
         $this->lockHandler->release($timeout->getIdentifier());
+
+        return $result;
     }
 
     /**

@@ -114,35 +114,6 @@ class StateMachineTest extends \PHPUnit_Framework_TestCase
         $machine->triggerEvent('event', 'identifier');
     }
 
-    public function testResolveTimeoutsAndLock()
-    {
-        $this->timeoutHandler->expects($this->any())->method('getExpired')->willReturn([]);
-
-        $this->lockHandler->expects($this->never())->method('lock')->with('identifier');
-        $this->lockHandler->expects($this->never())->method('release')->with('identifier');
-
-        $machine = new StateMachine($this->adapter, $this->payloadHandler, $this->timeoutHandler, $this->lockHandler);
-        $machine->resolveTimeouts();
-    }
-
-    public function testResolveTimeoutsAndLockWithPayloadInInvalidState()
-    {
-        $timeout = $this->getMockBuilder('\StateMachine\PayloadTimeout')->disableOriginalConstructor()->getMock();
-        $timeout->expects($this->any())->method('getState')->willReturn('timeout');
-        $timeout->expects($this->any())->method('getIdentifier')->willReturn('identifier');
-
-        $this->timeoutHandler->expects($this->any())->method('getExpired')->willReturn([$timeout]);
-        $this->payload->expects($this->any())->method('getState')->willReturn('differentState');
-        $this->payloadHandler->expects($this->any())->method('restore')->willReturn($this->payload);
-        $this->adapter->expects($this->any())->method('getProcess')->willReturn($this->process);
-
-        $this->lockHandler->expects($this->once())->method('lock')->with('identifier');
-        $this->lockHandler->expects($this->once())->method('release')->with('identifier');
-
-        $machine = new StateMachine($this->adapter, $this->payloadHandler, $this->timeoutHandler, $this->lockHandler);
-        $machine->resolveTimeouts();
-    }
-
     public function testResolveTimeoutsAndLockWithPayloadInCorrectState()
     {
         $timeout = $this->getMockBuilder('\StateMachine\PayloadTimeout')->disableOriginalConstructor()->getMock();
@@ -192,6 +163,10 @@ class StateMachineTest extends \PHPUnit_Framework_TestCase
         $machine->resolveTimeouts();
     }
 
+    /**
+     * @expectedException \StateMachine\Exception\InvalidStateException
+     * @expectedExceptionMessage Payload is in different state, expected "timeout" but is "differentState"
+     */
     public function testResolveTimeoutsWithPayloadInInvalidState()
     {
         $timeout = $this->getMockBuilder('\StateMachine\PayloadTimeout')->disableOriginalConstructor()->getMock();
@@ -201,9 +176,6 @@ class StateMachineTest extends \PHPUnit_Framework_TestCase
         $this->payload->expects($this->any())->method('getState')->willReturn('differentState');
         $this->payloadHandler->expects($this->any())->method('restore')->willReturn($this->payload);
         $this->adapter->expects($this->any())->method('getProcess')->willReturn($this->process);
-
-        $this->timeoutHandler->expects($this->once())->method('remove');
-        $this->process->expects($this->never())->method('triggerEvent');
 
         $machine = new StateMachine($this->adapter, $this->payloadHandler, $this->timeoutHandler, $this->lockHandler);
         $machine->resolveTimeouts();

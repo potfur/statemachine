@@ -72,8 +72,14 @@ final class Event implements EventInterface
      * @param Timeout|null      $timeout     date or interval when event should timeout
      * @param array             $attributes  additional attributes, like comment etc.
      */
-    public function __construct($name, $targetState = null, $errorState = null, CommandCollection $commands = null, Timeout $timeout = null, array $attributes = [])
-    {
+    public function __construct(
+        $name,
+        $targetState = null,
+        $errorState = null,
+        CommandCollection $commands = null,
+        Timeout $timeout = null,
+        array $attributes = []
+    ) {
         $this->assertName($name);
 
         $this->name = $name;
@@ -145,9 +151,8 @@ final class Event implements EventInterface
 
     /**
      * Return attributes container
-
      *
-*@return AttributeCollectionInterface
+     * @return AttributeCollectionInterface
      */
     public function getAttributes()
     {

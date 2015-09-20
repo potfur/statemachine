@@ -65,7 +65,13 @@ final class Process implements ProcessInterface
         $this->states = new GenericCollection($states, '\StateMachine\StateInterface');
 
         if (!$this->states->has($this->initialState)) {
-            throw new InvalidStateException(sprintf('Initial state "%s" does not exist in process "%s"', $this->initialState, $this->getName()));
+            throw new InvalidStateException(
+                sprintf(
+                    'Initial state "%s" does not exist in process "%s"',
+                    $this->initialState,
+                    $this->getName()
+                )
+            );
         }
     }
 
@@ -182,7 +188,14 @@ final class Process implements ProcessInterface
         $class = $this->subjectClass;
 
         if (!$subject instanceof $class) {
-            throw new InvalidSubjectException(sprintf('Unable to trigger with invalid payload in process "%s" - got "%s", expected "%s"', $this->getName(), $this->getType($subject), $class));
+            throw new InvalidSubjectException(
+                sprintf(
+                    'Unable to trigger with invalid payload in process "%s" - got "%s", expected "%s"',
+                    $this->getName(),
+                    $this->getType($subject),
+                    $class
+                )
+            );
         }
     }
 

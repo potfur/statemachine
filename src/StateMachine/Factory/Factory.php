@@ -1,7 +1,7 @@
 <?php
 
 /*
-* This file is part of the statemachine package
+* This file is part of the StateMachine package
 *
 * (c) Michal Wachowski <wachowski.michal@gmail.com>
 *

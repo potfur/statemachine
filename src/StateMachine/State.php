@@ -34,17 +34,16 @@ final class State implements StateInterface
 
     /**
      * Additional attributes
-
      *
-*@var AttributeCollectionInterface
+     * @var AttributeCollectionInterface
      */
     private $attributes;
 
     /**
-     * @param string           $name state name
-     * @param EventInterface[] $events list of events in state
-     * @param Flag[]           $flags array with state flags
-     * @param array           $attributes additional attributes like comment etc.
+     * @param string           $name       state name
+     * @param EventInterface[] $events     list of events in state
+     * @param Flag[]           $flags      array with state flags
+     * @param array            $attributes additional attributes like comment etc.
      */
     public function __construct($name, array $events = [], array $flags = [], array $attributes = [])
     {
@@ -150,9 +149,8 @@ final class State implements StateInterface
 
     /**
      * Return attributes container
-
      *
-*@return AttributeCollectionInterface
+     * @return AttributeCollectionInterface
      */
     public function getAttributes()
     {

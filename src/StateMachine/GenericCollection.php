@@ -62,7 +62,13 @@ class GenericCollection implements \Countable
     {
         $instanceOf = $this->instanceOf;
         if ($instanceOf !== null && !$element instanceof $instanceOf) {
-            throw new InvalidArgumentException(sprintf('Element in collection must be instance of "%s", got "%s"', $instanceOf, $this->getType($element)));
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Element in collection must be instance of "%s", got "%s"',
+                    $instanceOf,
+                    $this->getType($element)
+                )
+            );
         }
     }
 
