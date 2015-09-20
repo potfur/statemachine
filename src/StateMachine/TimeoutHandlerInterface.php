@@ -26,11 +26,11 @@ interface TimeoutHandlerInterface
     public function getExpired();
 
     /**
-     * Remove timeout
+     * Remove all timeouts for specified identifier
      *
-     * @param PayloadTimeout $timeout
+     * @param mixed $identifier
      */
-    public function remove(PayloadTimeout $timeout);
+    public function remove($identifier);
 
     /**
      * Creates timeout

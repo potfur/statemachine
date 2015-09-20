@@ -33,9 +33,9 @@ class FakeTimeoutHandler implements TimeoutHandlerInterface
         return $result;
     }
 
-    public function remove(PayloadTimeout $timeout)
+    public function remove($identifier)
     {
-        unset($this->timeouts[$timeout->getIdentifier()]);
+        unset($this->timeouts[$identifier]);
     }
 
     public function store(PayloadTimeout $timeout)

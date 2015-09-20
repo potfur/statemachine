@@ -56,12 +56,14 @@ class StateMachineTest extends \PHPUnit_Framework_TestCase
         $this->lockHandler = $this->getMock('\StateMachine\LockHandlerInterface');
     }
 
-    public function testTriggerEventAndLock()
+    public function testTriggerEventAndLockEntityAndRemoveAllRelatedTimeouts()
     {
         $this->payload->expects($this->any())->method('hasChanged')->willReturn(true);
+        $this->payload->expects($this->any())->method('getIdentifier')->willReturn('identifier');
         $this->process->expects($this->any())->method('hasTimeout')->willReturn(false);
         $this->adapter->expects($this->any())->method('getProcess')->willReturn($this->process);
         $this->payloadHandler->expects($this->any())->method('restore')->willReturn($this->payload);
+        $this->timeoutHandler->expects($this->once())->method('remove')->with('identifier');
 
         $this->lockHandler->expects($this->once())->method('lock')->with('identifier');
         $this->lockHandler->expects($this->once())->method('release')->with('identifier');

@@ -146,7 +146,6 @@ class StateMachine
 
         $result = $this->resolveEvent($process, $payload, $timeout->getEvent());
 
-        $this->timeoutHandler->remove($timeout);
         $this->lockHandler->release($timeout->getIdentifier());
 
         return $result;
@@ -166,6 +165,8 @@ class StateMachine
     private function resolveEvent(ProcessInterface $process, PayloadInterface $payload, $event)
     {
         $result = $process->triggerEvent($event, $payload);
+
+        $this->timeoutHandler->remove($payload->getIdentifier());
 
         if ($payload->hasChanged() && $process->hasTimeout($payload)) {
             $this->timeoutHandler->store($process->getTimeout($payload, new \DateTime()));
