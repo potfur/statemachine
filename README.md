@@ -93,9 +93,6 @@ $schema = [
 $process = (new ArrayFactory($schema))->getProcess();
 ```
 
-![](https://github.com/potfur/statemachine/wiki/schema_integration.png)
-
-
 ## Payload and triggering events
 
 To transit from one state to another an event needs to be trigered.
