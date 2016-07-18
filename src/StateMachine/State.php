@@ -15,7 +15,7 @@ namespace StateMachine;
 
 use StateMachine\Collection\Events;
 use StateMachine\Exception\InvalidArgumentException;
-use StateMachine\Payload\PayloadEnvelope;
+use StateMachine\Payload\Payload;
 
 /**
  * State machine state representation
@@ -121,12 +121,12 @@ final class State
      * Triggers event with given name and payload
      * Returns name of next state or null if no change
      *
-     * @param string          $name
-     * @param PayloadEnvelope $payload
+     * @param string  $name
+     * @param Payload $payload
      *
      * @return null|string
      */
-    public function triggerEvent($name, PayloadEnvelope $payload)
+    public function triggerEvent($name, Payload $payload)
     {
         return $this->event($name)->trigger($payload);
     }

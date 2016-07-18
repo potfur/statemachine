@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace StateMachine;
 
-use StateMachine\Payload\PayloadEnvelope;
+use StateMachine\Payload\Payload;
 
 /**
  * State machine
@@ -46,10 +46,10 @@ class StateMachine
      * Restore subject from handler by its identifier, then triggers event and saves subject
      * Return run history
      *
-     * @param string          $event
-     * @param PayloadEnvelope $payload
+     * @param string  $event
+     * @param Payload $payload
      */
-    public function triggerEvent($event, PayloadEnvelope $payload)
+    public function triggerEvent($event, Payload $payload)
     {
         if ($payload->state() === null) {
             $this->updatePayload($this->process->initialState(), $payload);
@@ -72,10 +72,10 @@ class StateMachine
      * Handles onStateWasSet event
      * Returns true if there was state change
      *
-     * @param State           $state
-     * @param PayloadEnvelope $payload
+     * @param State   $state
+     * @param Payload $payload
      */
-    private function handleOnStateWasSet(State $state, PayloadEnvelope $payload)
+    private function handleOnStateWasSet(State $state, Payload $payload)
     {
         while ($state->hasEvent(self::ON_STATE_WAS_SET)) {
             $newState = $state->triggerEvent(self::ON_STATE_WAS_SET, $payload);
@@ -91,10 +91,10 @@ class StateMachine
     /**
      * Update payload with new state data
      *
-     * @param State           $state
-     * @param PayloadEnvelope $payload
+     * @param State   $state
+     * @param Payload $payload
      */
-    private function updatePayload(State $state, PayloadEnvelope $payload)
+    private function updatePayload(State $state, Payload $payload)
     {
         $payload->changeState($state->name());
     }

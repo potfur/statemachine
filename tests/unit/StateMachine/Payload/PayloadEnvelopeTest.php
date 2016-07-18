@@ -13,7 +13,6 @@ namespace unit\StateMachine\Payload;
 
 
 use StateMachine\Payload\PayloadEnvelope;
-use StateMachine\Payload\Stateful;
 
 class PayloadEnvelopeTest extends \PHPUnit_Framework_TestCase
 {
@@ -48,23 +47,5 @@ class PayloadEnvelopeTest extends \PHPUnit_Framework_TestCase
     {
         $envelope = PayloadEnvelope::wrap('stuff');
         $this->assertSame('stuff', $envelope->subject());
-    }
-
-    public function testConstructWithStateFromStatefulPayload()
-    {
-        $payload = $this->createMock(Stateful::class);
-        $payload->expects($this->any())->method('state')->willReturn('currentState');
-
-        $envelope = PayloadEnvelope::wrap($payload);
-        $this->assertEquals('currentState', $envelope->state());
-    }
-
-    public function testSetStateWithStatefulPayload()
-    {
-        $payload = $this->createMock(Stateful::class);
-        $payload->expects($this->once())->method('changeState')->with('newState');
-
-        $envelope = PayloadEnvelope::wrap($payload);
-        $envelope->changeState('newState');
     }
 }

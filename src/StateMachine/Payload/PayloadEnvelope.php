@@ -18,7 +18,7 @@ namespace StateMachine\Payload;
  *
  * @package StateMachine
  */
-final class PayloadEnvelope
+final class PayloadEnvelope implements Payload
 {
     /**
      * Flag if context changed
@@ -51,12 +51,13 @@ final class PayloadEnvelope
     private function __construct($subject)
     {
         $this->subject = $subject;
-
-        if ($this->isSubjectStateful()) {
-            $this->state = $this->subject->state();
-        }
     }
 
+    /**
+     * @param mixed $subject
+     *
+     * @return PayloadEnvelope
+     */
     public static function wrap($subject): PayloadEnvelope
     {
         return new static($subject);
@@ -92,10 +93,6 @@ final class PayloadEnvelope
         $this->state = $name;
         $this->history[] = $name;
         $this->hasChanged = true;
-
-        if ($this->isSubjectStateful()) {
-            $this->subject->changeState($this->state);
-        }
     }
 
     /**
@@ -116,15 +113,5 @@ final class PayloadEnvelope
     public function subject()
     {
         return $this->subject;
-    }
-
-    /**
-     * Return true if subject implements Stateful interface
-     *
-     * @return bool
-     */
-    private function isSubjectStateful()
-    {
-        return $this->subject instanceof Stateful;
     }
 }

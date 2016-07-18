@@ -93,10 +93,13 @@ $schema = [
 $process = (new ArrayFactory($schema))->getProcess();
 ```
 
+![](https://github.com/potfur/statemachine/wiki/schema_integration.png)
+
+
 ## Payload and triggering events
 
 To transit from one state to another an event needs to be trigered.
-When it happens StateMachine will pass provided _context_ wrapped in payload envelope to _command_, execute it and follow resulting transitions.
+When it happens StateMachine will pass provided _context_ wrapped as a payload to _command_, execute it and follow resulting transitions.
 
 ```php
 $payload = PayloadEnvelope::wrap('context');
@@ -105,19 +108,5 @@ $machine = new StateMachine($process);
 $history = $machine->triggerEvent('goPending', $payload);
 ```
 
-`PayloadEnvelope` is a simple wrapper that holds _context_. It can be anything, simple value, array, object etc.
+`PayloadEnvelope` is an implementation of `Payload` - simple wrapper that holds _context_. It can be anything, simple value, array, object etc.
 `::triggerEvent` method returns history of transitions, ie. list of all states that _context_ passed.
-
-## Renderer
-
-For ease of designing processes, StateMachine component includes `Renderer` that can render `Process` instances as `PNG` or `SVG` files.
-
-```php
-$process = (new ArrayAdapter($schema))->getProcess();
-$document = Document::fromProcess($process);
-$renderer = new Renderer('/usr/bin/dot');
-$pathToPng = $renderer->png($document, 'dot.png');
-$pathToSvg = $renderer->svg($document, 'dot.svg');
-```
-
-`Renderer` requires [Graphviz](http://www.graphviz.org/) to draw graphs.

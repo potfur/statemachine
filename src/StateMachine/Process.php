@@ -16,7 +16,7 @@ namespace StateMachine;
 use StateMachine\Collection\States;
 use StateMachine\Exception\InvalidArgumentException;
 use StateMachine\Exception\InvalidStateException;
-use StateMachine\Payload\PayloadEnvelope;
+use StateMachine\Payload\Payload;
 
 /**
  * State machine process
@@ -47,8 +47,8 @@ final class Process implements ProcessInterface
     private $states = [];
 
     /**
-     * @param string           $name         process/schema name
-     * @param string           $initialState initial state for entities starting process
+     * @param string  $name         process/schema name
+     * @param string  $initialState initial state for entities starting process
      * @param State[] $states
      *
      * @throws InvalidArgumentException|InvalidStateException
@@ -116,12 +116,12 @@ final class Process implements ProcessInterface
      * Trigger event for payload
      * Return next state name
      *
-     * @param string          $event
-     * @param PayloadEnvelope $payload
+     * @param string  $event
+     * @param Payload $payload
      *
      * @return string
      */
-    public function triggerEvent($event, PayloadEnvelope $payload): string
+    public function triggerEvent($event, Payload $payload): string
     {
         return $this->state($payload->state())->triggerEvent($event, $payload);
     }

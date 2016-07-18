@@ -14,7 +14,7 @@ declare(strict_types = 1);
 namespace StateMachine;
 
 use StateMachine\Exception\InvalidArgumentException;
-use StateMachine\Payload\PayloadEnvelope;
+use StateMachine\Payload\Payload;
 
 /**
  * Describes state machine event
@@ -132,11 +132,11 @@ final class Event
     /**
      * Triggers event and return next state name or null if there is no state change
      *
-     * @param PayloadEnvelope $payload
+     * @param Payload $payload
      *
      * @return null|string
      */
-    public function trigger(PayloadEnvelope $payload)
+    public function trigger(Payload $payload)
     {
         if (!$this->command) {
             return $this->targetState();

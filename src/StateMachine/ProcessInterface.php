@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace StateMachine;
 
-use StateMachine\Payload\PayloadEnvelope;
+use StateMachine\Payload\Payload;
 
 /**
  * State machine process interface
@@ -27,7 +27,7 @@ interface ProcessInterface
      *
      * @return string
      */
-    public function name(): string ;
+    public function name(): string;
 
     /**
      * Return initial state
@@ -56,10 +56,10 @@ interface ProcessInterface
      * Trigger event for payload
      * Return next state name
      *
-     * @param string           $event
-     * @param PayloadEnvelope $payload
+     * @param string  $event
+     * @param Payload $payload
      *
      * @return string
      */
-    public function triggerEvent($event, PayloadEnvelope $payload): string;
+    public function triggerEvent($event, Payload $payload): string;
 }
