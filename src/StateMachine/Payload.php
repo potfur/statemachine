@@ -11,7 +11,7 @@ declare(strict_types = 1);
 * file that was distributed with this source code.
 */
 
-namespace StateMachine\Payload;
+namespace StateMachine;
 
 /**
  * Payload envelope, used to transport subject trough state machine process

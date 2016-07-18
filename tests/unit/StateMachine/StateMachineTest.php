@@ -12,7 +12,7 @@
 namespace unit\StateMachine;
 
 use StateMachine\Event;
-use StateMachine\Payload\PayloadEnvelope;
+use StateMachine\PayloadEnvelope;
 use StateMachine\Process;
 use StateMachine\State;
 use StateMachine\StateMachine;

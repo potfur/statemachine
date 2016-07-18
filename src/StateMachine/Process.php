@@ -16,7 +16,7 @@ namespace StateMachine;
 use StateMachine\Collection\States;
 use StateMachine\Exception\InvalidArgumentException;
 use StateMachine\Exception\InvalidStateException;
-use StateMachine\Payload\Payload;
+use StateMachine\Payload;
 
 /**
  * State machine process

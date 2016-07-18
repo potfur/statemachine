@@ -12,7 +12,7 @@
 namespace unit\StateMachine\Payload;
 
 
-use StateMachine\Payload\PayloadEnvelope;
+use StateMachine\PayloadEnvelope;
 
 class PayloadEnvelopeTest extends \PHPUnit_Framework_TestCase
 {

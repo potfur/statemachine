@@ -13,7 +13,7 @@ declare(strict_types = 1);
 
 namespace StateMachine;
 
-use StateMachine\Payload\Payload;
+use StateMachine\Payload;
 
 /**
  * State machine process interface

@@ -14,7 +14,7 @@ namespace unit\StateMachine;
 use StateMachine\Event;
 use StateMachine\Exception\InvalidArgumentException;
 use StateMachine\Exception\InvalidStateException;
-use StateMachine\Payload\PayloadEnvelope;
+use StateMachine\PayloadEnvelope;
 use StateMachine\Process;
 use StateMachine\State;
 

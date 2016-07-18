@@ -13,7 +13,7 @@ namespace integration\Statemachine;
 
 
 use StateMachine\ArrayFactory;
-use StateMachine\Payload\PayloadEnvelope;
+use StateMachine\PayloadEnvelope;
 use StateMachine\StateMachine;
 
 class StateMachineTest extends \PHPUnit_Framework_TestCase

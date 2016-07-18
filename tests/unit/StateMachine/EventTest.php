@@ -14,7 +14,7 @@ namespace unit\StateMachine;
 use StateMachine\Attributes;
 use StateMachine\Event;
 use StateMachine\Exception\InvalidArgumentException;
-use StateMachine\Payload\PayloadEnvelope;
+use StateMachine\PayloadEnvelope;
 
 class CommandMock
 {

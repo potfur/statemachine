@@ -15,7 +15,7 @@ use StateMachine\Attributes;
 use StateMachine\Event;
 use StateMachine\Exception\InvalidArgumentException;
 use StateMachine\Collection\OutOfRangeException;
-use StateMachine\Payload\PayloadEnvelope;
+use StateMachine\PayloadEnvelope;
 use StateMachine\State;
 
 class StateTest extends \PHPUnit_Framework_TestCase
