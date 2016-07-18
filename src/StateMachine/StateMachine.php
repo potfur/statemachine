@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 /*
 * This file is part of the StateMachine package
 *
@@ -11,7 +13,7 @@
 
 namespace StateMachine;
 
-use StateMachine\Exception\InvalidStateException;
+use StateMachine\Payload\PayloadEnvelope;
 
 /**
  * State machine
@@ -20,54 +22,23 @@ use StateMachine\Exception\InvalidStateException;
  */
 class StateMachine
 {
-    const LOCK_TIMEOUT_INTERVAL = 'PT1H';
+    const ON_STATE_WAS_SET = 'onStateWasSet';
 
     /**
      * Schema adapter
      *
-     * @var AdapterInterface
+     * @var ProcessInterface
      */
-    private $adapter;
-
-    /**
-     * Handler for payload storing/restoring
-     *
-     * @var PayloadHandlerInterface
-     */
-    private $payloadHandler;
-
-    /**
-     * Handler for timeouts
-     *
-     * @var TimeoutHandlerInterface
-     */
-    private $timeoutHandler;
-
-    /**
-     * Handler for concurrent runs
-     *
-     * @var LockHandlerInterface
-     */
-    private $lockHandler;
+    private $process;
 
     /**
      * Constructor
      *
-     * @param AdapterInterface        $adapter
-     * @param PayloadHandlerInterface $payloadHandler
-     * @param TimeoutHandlerInterface $timeoutHandler
-     * @param LockHandlerInterface    $lockHandler handler for concurrent runs
+     * @param Process $process
      */
-    public function __construct(
-        AdapterInterface $adapter,
-        PayloadHandlerInterface $payloadHandler,
-        TimeoutHandlerInterface $timeoutHandler,
-        LockHandlerInterface $lockHandler
-    ) {
-        $this->adapter = $adapter;
-        $this->payloadHandler = $payloadHandler;
-        $this->timeoutHandler = $timeoutHandler;
-        $this->lockHandler = $lockHandler;
+    public function __construct(Process $process)
+    {
+        $this->process = $process;
     }
 
     /**
@@ -75,105 +46,56 @@ class StateMachine
      * Restore subject from handler by its identifier, then triggers event and saves subject
      * Return run history
      *
-     * @param string $event
-     * @param mixed  $identifier
-     *
-     * @return array
+     * @param string          $event
+     * @param PayloadEnvelope $payload
      */
-    public function triggerEvent($event, $identifier)
+    public function triggerEvent($event, PayloadEnvelope $payload)
     {
-        $process = $this->adapter->getProcess();
+        if ($payload->state() === null) {
+            $this->updatePayload($this->process->initialState(), $payload);
+        }
 
-        $this->lockHandler->lock($identifier);
+        $state = $this->process->state($payload->state());
 
-        $payload = $this->payloadHandler->restore($identifier);
-        $history = $this->resolveEvent($process, $payload, $event);
+        $nextStateName = $state->triggerEvent($event, $payload);
+        if ($nextStateName === null) {
+            return;
+        }
 
-        $this->lockHandler->release($identifier);
+        $state = $this->process->state($nextStateName);
 
-        return $history;
+        $this->updatePayload($state, $payload);
+        $this->handleOnStateWasSet($state, $payload);
     }
 
     /**
-     * Resolve timeouts
-     * Retrieves all expired timeouts and triggers proper events
-     * Return array of run histories
+     * Handles onStateWasSet event
+     * Returns true if there was state change
      *
-     * @return array
+     * @param State           $state
+     * @param PayloadEnvelope $payload
      */
-    public function resolveTimeouts()
+    private function handleOnStateWasSet(State $state, PayloadEnvelope $payload)
     {
-        $this->lockHandler->releaseTimedOut(new \DateInterval(self::LOCK_TIMEOUT_INTERVAL));
-
-        $result = [];
-        $process = $this->adapter->getProcess();
-        $timeouts = $this->timeoutHandler->getExpired();
-
-        foreach ($timeouts as $timeout) {
-            if ($this->lockHandler->isLocked($timeout->getIdentifier())) {
-                return null;
+        while ($state->hasEvent(self::ON_STATE_WAS_SET)) {
+            $newState = $state->triggerEvent(self::ON_STATE_WAS_SET, $payload);
+            if ($newState === null) {
+                break;
             }
 
-            $result[$timeout->getIdentifier()] = $this->resolveTimeout($process, $timeout);
+            $state = $this->process->state($newState);
+            $this->updatePayload($state, $payload);
         }
-
-        return $result;
     }
 
     /**
-     * Resolve single timeout
+     * Update payload with new state data
      *
-     * @param ProcessInterface $process
-     * @param PayloadTimeout   $timeout
-     *
-     * @return array
-     * @throws InvalidStateException
+     * @param State           $state
+     * @param PayloadEnvelope $payload
      */
-    private function resolveTimeout(ProcessInterface $process, PayloadTimeout $timeout)
+    private function updatePayload(State $state, PayloadEnvelope $payload)
     {
-        $this->lockHandler->lock($timeout->getIdentifier());
-        $payload = $this->payloadHandler->restore($timeout->getIdentifier());
-
-        if ($payload->getState() !== $timeout->getState()) {
-            throw new InvalidStateException(
-                sprintf(
-                    'Payload is in different state, expected "%s" but is "%s" ',
-                    $timeout->getState(),
-                    $payload->getState()
-                )
-            );
-        }
-
-        $result = $this->resolveEvent($process, $payload, $timeout->getEvent());
-
-        $this->lockHandler->release($timeout->getIdentifier());
-
-        return $result;
-    }
-
-    /**
-     * Execute event in set process for set payload
-     * If final state has timeout event, store it for further execution
-     * Return run history
-     *
-     * @param ProcessInterface $process
-     * @param PayloadInterface $payload
-     * @param string           $event
-     *
-     * @return array
-     */
-    private function resolveEvent(ProcessInterface $process, PayloadInterface $payload, $event)
-    {
-        $result = $process->triggerEvent($event, $payload);
-
-        $this->timeoutHandler->remove($payload->getIdentifier());
-
-        if ($payload->hasChanged() && $process->hasTimeout($payload)) {
-            $this->timeoutHandler->store($process->getTimeout($payload, new \DateTime()));
-        }
-
-        $this->payloadHandler->store($payload);
-
-        return $result;
+        $payload->changeState($state->name());
     }
 }

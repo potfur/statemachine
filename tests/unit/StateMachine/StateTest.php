@@ -9,66 +9,45 @@
 * file that was distributed with this source code.
 */
 
-namespace StateMachine;
+namespace unit\StateMachine;
+
+use StateMachine\Attributes;
+use StateMachine\Event;
+use StateMachine\Exception\InvalidArgumentException;
+use StateMachine\Collection\OutOfRangeException;
+use StateMachine\Payload\PayloadEnvelope;
+use StateMachine\State;
 
 class StateTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var EventInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var Event
      */
     private $event;
 
-    /**
-     * @var Flag|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $flag;
-
     public function setUp()
     {
-        $this->event = $this->getMockBuilder('\StateMachine\EventInterface')->disableOriginalConstructor()->getMock();
-        $this->event->expects($this->any())->method('__toString')->willReturn('eventName');
-
-        $this->flag = $this->getMockBuilder('\StateMachine\Flag')->disableOriginalConstructor()->getMock();
-        $this->flag->expects($this->any())->method('__toString')->willReturn('flagName');
+        $this->event = new Event('eventName');
     }
 
-    /**
-     * @expectedException \StateMachine\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Element in collection must be instance of "\StateMachine\EventInterface", got "string"
-     */
-    public function testProvidedInvalidEvent()
-    {
-        new State('stateName', ['yadayada'], []);
-    }
-
-    /**
-     * @expectedException \StateMachine\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Element in collection must be instance of "\StateMachine\Flag", got "string"
-     */
-    public function testProvidedInvalidFlag()
-    {
-        new State('stateName', [], ['yadayada']);
-    }
-
-    /**
-     * @expectedException \StateMachine\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid state name, can not be empty string
-     */
     public function testNameIsNull()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid state name, can not be empty string');
+
         new State('', [], []);
     }
 
     public function testGetName()
     {
         $state = new State('stateName', [], []);
-        $this->assertEquals('stateName', $state->getName());
+        $this->assertEquals('stateName', $state->name());
     }
 
     public function testGetEvents()
     {
-        $state = new State('stateName', [$this->event], [$this->flag]);
-        $this->assertEquals(['eventName' => $this->event], $state->getEvents());
+        $state = new State('stateName', [$this->event]);
+        $this->assertEquals(['eventName' => $this->event], $state->events());
     }
 
     /**
@@ -76,7 +55,7 @@ class StateTest extends \PHPUnit_Framework_TestCase
      */
     public function testHasEvent($event, $expected)
     {
-        $state = new State('stateName', [$this->event], [$this->flag]);
+        $state = new State('stateName', [$this->event]);
         $this->assertEquals($expected, $state->hasEvent($event));
     }
 
@@ -90,85 +69,31 @@ class StateTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEvent()
     {
-        $state = new State('stateName', [$this->event], [$this->flag]);
-        $this->assertEquals($this->event, $state->getEvent('eventName'));
+        $state = new State('stateName', [$this->event]);
+        $this->assertEquals($this->event, $state->event('eventName'));
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Element for offset "undefinedEvent" not found
-     */
     public function testGetUndefinedEvent()
     {
-        $state = new State('stateName', [$this->event], [$this->flag]);
-        $state->getEvent('undefinedEvent');
-    }
+         $this->expectException(OutOfRangeException::class);
+         $this->expectExceptionMessage('Element for offset "undefinedEvent" not found');
 
-    public function testGetFlags()
-    {
-        $state = new State('stateName', [$this->event], [$this->flag]);
-        $this->assertSame(['flagName' => $this->flag], $state->getFlags());
-    }
-
-    /**
-     * @dataProvider hasFlagProvider
-     */
-    public function testHasFlag($event, $expected)
-    {
-        $state = new State('stateName', [$this->event], [$this->flag]);
-        $this->assertEquals($expected, $state->hasFlag($event));
-    }
-
-    public function hasFlagProvider()
-    {
-        return [
-            ['flagName', true],
-            ['foobar', false]
-        ];
-    }
-
-    public function testGetFlag()
-    {
-        $state = new State('stateName', [$this->event], [$this->flag]);
-        $this->assertEquals($this->flag, $state->getFlag('flagName'));
-    }
-
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Element for offset "undefinedFlag" not found
-     */
-    public function testGetUndefinedFlag()
-    {
-        $state = new State('stateName', [$this->event], [$this->flag]);
-        $state->getFlag('undefinedFlag');
+        $state = new State('stateName', [$this->event]);
+        $state->event('undefinedEvent');
     }
 
     public function testAttributes()
     {
         $state = new State('stateName', [], [], []);
-        $this->assertInstanceOf('\StateMachine\AttributeCollectionInterface', $state->getAttributes());
+        $this->assertInstanceOf(Attributes::class, $state->attributes());
     }
 
-    /**
-     * @dataProvider triggerEventProvider
-     */
-    public function testTriggerEvent($result)
+    public function testTriggerEvent()
     {
-        $this->event->expects($this->any())->method('trigger')->willReturn($result);
-
-        $payload = $this->getMock('\StateMachine\PayloadInterface');
-
-        $state = new State('stateName', [$this->event], [$this->flag]);
-        $this->assertEquals($result, $state->triggerEvent('eventName', $payload));
-    }
-
-    public function triggerEventProvider()
-    {
-        return [
-            ['target'],
-            ['error'],
-            [null]
-        ];
+        $command = function () { return true; };
+        $event = new Event('eventName', 'targetState', 'errorState', $command);
+        $state = new State('stateName', [$event]);
+        $this->assertEquals('targetState', $state->triggerEvent('eventName', PayloadEnvelope::wrap('stuff')));
     }
 
     public function testString()

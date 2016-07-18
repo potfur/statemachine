@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 /*
 * This file is part of the statemachine package
 *
@@ -16,7 +18,7 @@ namespace StateMachine;
  *
  * @package StateMachine
  */
-final class AttributeCollection implements AttributeCollectionInterface
+final class Attributes
 {
     private $attributes;
 

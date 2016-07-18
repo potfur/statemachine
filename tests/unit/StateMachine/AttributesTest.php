@@ -11,43 +11,43 @@
 
 namespace unit\StateMachine;
 
-use StateMachine\AttributeCollection;
+use StateMachine\Attributes;
 
 class AttributesTest extends \PHPUnit_Framework_TestCase
 {
     public function testExists()
     {
-        $attributes = new AttributeCollection(['foo' => 'bar']);
+        $attributes = new Attributes(['foo' => 'bar']);
         $this->assertTrue($attributes->exists('foo'));
     }
 
     public function testExistsWhenNull()
     {
-        $attributes = new AttributeCollection(['foo' => null]);
+        $attributes = new Attributes(['foo' => null]);
         $this->assertTrue($attributes->exists('foo'));
     }
 
     public function testDoesNotExist()
     {
-        $attributes = new AttributeCollection([]);
+        $attributes = new Attributes([]);
         $this->assertFalse($attributes->exists('foo'));
     }
 
     public function testGet()
     {
-        $attributes = new AttributeCollection(['foo' => 'bar']);
+        $attributes = new Attributes(['foo' => 'bar']);
         $this->assertEquals('bar' , $attributes->get('foo'));
     }
 
     public function testGetMissingKey()
     {
-        $attributes = new AttributeCollection();
+        $attributes = new Attributes();
         $this->assertNull($attributes->get('foo'));
     }
 
     public function testGetMissingKeyWithDefault()
     {
-        $attributes = new AttributeCollection();
+        $attributes = new Attributes();
         $this->assertEquals('bar' , $attributes->get('foo', 'bar'));
     }
 }

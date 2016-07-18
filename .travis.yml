@@ -1,23 +1,15 @@
 language: php
 php:
-  - 5.6
-  - 5.5
-  - 5.4
-  - hhvm
+  - 7.0
 
 before_script:
   - composer self-update
   - composer install --prefer-dist
 
 script:
-  - phpunit --testsuite unit --coverage-clover=coverage.clover
-  - phpunit --testsuite integration
+  - phpunit -c phpunit.dist.xml --testsuite unit --coverage-clover coverage.clover
+  - phpunit -c phpunit.dist.xml --testsuite integration
 
 after_script:
   - wget https://scrutinizer-ci.com/ocular.phar
   - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
-
-# temporary
-matrix:
-  allow_failures:
-    - php: hhvm
