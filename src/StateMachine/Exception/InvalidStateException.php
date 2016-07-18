@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 /*
 * This file is part of the StateMachine package
 *
@@ -18,5 +20,14 @@ namespace StateMachine\Exception;
  */
 class InvalidStateException extends StateMachineException
 {
-
+    public static function missingInitialState($processName, $initialState): InvalidStateException
+    {
+        return new InvalidStateException(
+            sprintf(
+                'Initial state "%s" does not exist in process "%s"',
+                $initialState,
+                $processName
+            )
+        );
+    }
 }

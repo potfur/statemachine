@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 /*
 * This file is part of the StateMachine package
 *
@@ -9,23 +11,14 @@
 * file that was distributed with this source code.
 */
 
-namespace StateMachine\Adapter;
-
-use StateMachine\AdapterInterface;
-use StateMachine\CommandCollection;
-use StateMachine\Event;
-use StateMachine\EventInterface;
-use StateMachine\Flag;
-use StateMachine\Process;
-use StateMachine\State;
-use StateMachine\Timeout;
+namespace StateMachine;
 
 /**
  * Adapter for array schemas
  *
  * @package StateMachine
  */
-class ArrayAdapter implements AdapterInterface
+final class ArrayFactory
 {
     /**
      * Schema array
@@ -56,19 +49,9 @@ class ArrayAdapter implements AdapterInterface
      *
      * @return string
      */
-    public function getSchemaName()
+    public function getSchemaName(): string
     {
         return $this->getOffsetFromArray($this->schema, 'name');
-    }
-
-    /**
-     * Return fully qualified subjects class
-     *
-     * @return string
-     */
-    public function getSubjectClass()
-    {
-        return $this->getOffsetFromArray($this->schema, 'subjectClass');
     }
 
     /**
@@ -76,7 +59,7 @@ class ArrayAdapter implements AdapterInterface
      *
      * @return string
      */
-    public function getInitialState()
+    public function getInitialState(): string
     {
         return $this->getOffsetFromArray($this->schema, 'initialState');
     }
@@ -86,15 +69,14 @@ class ArrayAdapter implements AdapterInterface
      *
      * @return array
      */
-    private function buildStates()
+    private function buildStates(): array
     {
         $states = [];
         foreach ($this->getOffsetFromArray($this->schema, 'states', []) as $state) {
             $states[] = new State(
                 $this->getOffsetFromArray($state, 'name'),
                 $this->buildEvents($state),
-                $this->buildFlags($state),
-                $this->getAdditionalFromArray($state, ['events', 'name', 'flags'])
+                $this->getAdditionalFromArray($state, ['events', 'name'])
             );
         }
 
@@ -102,30 +84,13 @@ class ArrayAdapter implements AdapterInterface
     }
 
     /**
-     * Build state flags
-     *
-     * @param array $state
-     *
-     * @return Flag[]
-     */
-    private function buildFlags($state)
-    {
-        $flags = [];
-        foreach ($this->getOffsetFromArray($state, 'flags', []) as $name => $value) {
-            $flags[] = new Flag($name, $value);
-        }
-
-        return $flags;
-    }
-
-    /**
      * Build state events
      *
      * @param array $state
      *
-     * @return EventInterface[]
+     * @return Event[]
      */
-    private function buildEvents(array $state)
+    private function buildEvents(array $state): array
     {
         $events = [];
         foreach ($this->getOffsetFromArray($state, 'events', []) as $event) {
@@ -133,9 +98,8 @@ class ArrayAdapter implements AdapterInterface
                 $this->getOffsetFromArray($event, 'name'),
                 $this->getOffsetFromArray($event, 'targetState'),
                 $this->getOffsetFromArray($event, 'errorState'),
-                $this->buildCommands($event),
-                $this->buildTimeout($this->getOffsetFromArray($event, 'timeout')),
-                $this->getAdditionalFromArray($event, ['name', 'commands', 'targetState', 'errorState', 'timeout'])
+                $this->getOffsetFromArray($event, 'command'),
+                $this->getAdditionalFromArray($event, ['name', 'command', 'targetState', 'errorState'])
             );
         }
 
@@ -143,51 +107,15 @@ class ArrayAdapter implements AdapterInterface
     }
 
     /**
-     * Build timeout
-     *
-     * @param mixed $timeout
-     *
-     * @return Timeout|null
-     */
-    private function buildTimeout($timeout)
-    {
-        if ($timeout === null) {
-            return null;
-        }
-
-        return new Timeout($timeout);
-    }
-
-    /**
-     * Build event command collection
-     *
-     * @param array $event
-     *
-     * @return CommandCollection
-     */
-    private function buildCommands($event)
-    {
-        $collection = new CommandCollection();
-        foreach ($this->getOffsetFromArray($event, 'commands', []) as $command) {
-            $collection->add($command);
-        }
-
-        $collection->resetStatus();
-
-        return $collection;
-    }
-
-    /**
      * Return schema process
      *
      * @return Process
      */
-    public function getProcess()
+    public function getProcess(): Process
     {
         if ($this->process === null) {
             $this->process = new Process(
                 $this->getSchemaName(),
-                $this->getSubjectClass(),
                 $this->getInitialState(),
                 $this->buildStates()
             );
@@ -218,7 +146,7 @@ class ArrayAdapter implements AdapterInterface
      *
      * @return array
      */
-    private function getAdditionalFromArray(array $array, array $ignoredKeys)
+    private function getAdditionalFromArray(array $array, array $ignoredKeys): array
     {
         return array_intersect_key($array, array_diff_key($array, array_flip($ignoredKeys)));
     }

@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types = 1);
+
 /*
-* This file is part of the StateMachine package
+* This file is part of the statemachine package
 *
 * (c) Michal Wachowski <wachowski.michal@gmail.com>
 *
@@ -12,13 +14,14 @@
 namespace StateMachine;
 
 use StateMachine\Exception\InvalidArgumentException;
+use StateMachine\Payload\PayloadEnvelope;
 
 /**
  * Describes state machine event
  *
  * @package StateMachine
  */
-final class Event implements EventInterface
+final class Event
 {
     /**
      * Event name
@@ -42,66 +45,46 @@ final class Event implements EventInterface
     private $errorState;
 
     /**
-     * Commands collection
+     * Command executed when event is triggered
      *
-     * @var CommandCollection
+     * @var callable
      */
-    private $commands;
+    private $command;
 
     /**
-     * Timeout
+     * Additional attributes
      *
-     * @var Timeout|null
-     */
-    private $timeout;
-
-    /**
-     * Additional comment
-     *
-     * @var AttributeCollectionInterface
+     * @var Attributes
      */
     private $attributes;
 
     /**
      * Constructor
      *
-     * @param string            $name        event name
-     * @param string            $targetState state where subject will go when all commands were executed successfully
-     * @param string            $errorState  state where subject will go when command execution failed
-     * @param CommandCollection $commands    collection of commands
-     * @param Timeout|null      $timeout     date or interval when event should timeout
-     * @param array             $attributes  additional attributes, like comment etc.
+     * @param string   $name        event name
+     * @param string   $targetState state where subject will go when all commands were executed successfully
+     * @param string   $errorState  state where subject will go when command execution failed
+     * @param callable $command     collection of commands
+     * @param array    $attributes  additional attributes.
+     *
+     * @throws InvalidArgumentException
      */
     public function __construct(
         $name,
         $targetState = null,
         $errorState = null,
-        CommandCollection $commands = null,
-        Timeout $timeout = null,
+        callable $command = null,
         array $attributes = []
     ) {
-        $this->assertName($name);
+        if (empty($name)) {
+            throw InvalidArgumentException::emptyEventName();
+        }
 
         $this->name = $name;
         $this->targetState = $targetState;
         $this->errorState = $errorState;
-        $this->commands = $commands;
-        $this->timeout = $timeout;
-        $this->attributes = new AttributeCollection($attributes);
-    }
-
-    /**
-     * Assert if name is non empty string
-     *
-     * @param string $name
-     *
-     * @throws InvalidArgumentException
-     */
-    private function assertName($name)
-    {
-        if (empty($name)) {
-            throw new InvalidArgumentException('Invalid event name, can not be empty string');
-        }
+        $this->command = $command;
+        $this->attributes = new Attributes($attributes);
     }
 
     /**
@@ -109,7 +92,7 @@ final class Event implements EventInterface
      *
      * @return string
      */
-    public function getName()
+    public function name(): string
     {
         return $this->name;
     }
@@ -118,9 +101,9 @@ final class Event implements EventInterface
      * Return name of success state
      * Subject will go into this state when all commands execute properly
      *
-     * @return string
+     * @return null|string
      */
-    public function getTargetState()
+    public function targetState()
     {
         return $this->targetState;
     }
@@ -129,78 +112,37 @@ final class Event implements EventInterface
      * Return error state name
      * State where subject will go when something goes wrong
      *
-     * @return string
+     * @return null|string
      */
-    public function getErrorState()
+    public function errorState()
     {
         return $this->errorState;
     }
 
     /**
-     * Return list of transition types with target states
-     *
-     * @return array
-     */
-    public function getStates()
-    {
-        return [
-            'target' => $this->targetState,
-            'error' => $this->errorState
-        ];
-    }
-
-    /**
      * Return attributes container
      *
-     * @return AttributeCollectionInterface
+     * @return Attributes
      */
-    public function getAttributes()
+    public function attributes(): Attributes
     {
         return $this->attributes;
     }
 
     /**
-     * Return true if event has timeout
-     *
-     * @return bool
-     */
-    public function hasTimeout()
-    {
-        return $this->timeout !== null;
-    }
-
-    /**
-     * Return timeout value
-     *
-     * @return Timeout|null
-     */
-    public function getTimeout()
-    {
-        return $this->timeout;
-    }
-
-    /**
-     * Return when event timeout
-     *
-     * @param \DateTime $now date will be used as reference for timeouts defined as intervals
-     *
-     * @return \DateTime
-     */
-    public function timeoutAt(\DateTime $now)
-    {
-        return $this->timeout->timeoutAt($now);
-    }
-
-    /**
      * Triggers event and return next state name or null if there is no state change
      *
-     * @param PayloadInterface $payload
+     * @param PayloadEnvelope $payload
      *
-     * @return string
+     * @return null|string
      */
-    public function trigger(PayloadInterface $payload)
+    public function trigger(PayloadEnvelope $payload)
     {
-        return $this->commands->execute($payload) ? $this->getTargetState() : $this->getErrorState();
+        if (!$this->command) {
+            return $this->targetState();
+        }
+
+        return call_user_func($this->command, $payload) ? $this->targetState() : $this->errorState();
     }
 
     /**
@@ -208,8 +150,8 @@ final class Event implements EventInterface
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->getName();
+        return $this->name();
     }
 }

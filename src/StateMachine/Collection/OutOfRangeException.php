@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 /*
 * This file is part of the StateMachine package
 *
@@ -9,7 +11,9 @@
 * file that was distributed with this source code.
 */
 
-namespace StateMachine\Exception;
+namespace StateMachine\Collection;
+
+use StateMachine\Exception\StateMachineException;
 
 /**
  * Exception thrown when an illegal index was requested
@@ -18,5 +22,8 @@ namespace StateMachine\Exception;
  */
 class OutOfRangeException extends StateMachineException
 {
-
+    public static function offsetNotFound($offset): OutOfRangeException
+    {
+        return new OutOfRangeException(sprintf('Element for offset "%s" not found', $offset));
+    }
 }
