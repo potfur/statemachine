@@ -9,15 +9,13 @@
 * file that was distributed with this source code.
 */
 
-namespace StateMachine\Adapter;
+namespace unit\StateMachine\Adapter;
 
 
-use StateMachine\CommandCollection;
+use StateMachine\ArrayFactory;
 use StateMachine\Event;
-use StateMachine\Flag;
 use StateMachine\Process;
 use StateMachine\State;
-use StateMachine\Timeout;
 
 class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,23 +23,15 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
     {
         $schema = ['name' => 'schemaName'];
 
-        $adapter = new ArrayAdapter($schema);
+        $adapter = new ArrayFactory($schema);
         $this->assertEquals('schemaName', $adapter->getSchemaName());
-    }
-
-    public function testSubjectClass()
-    {
-        $schema = ['subjectClass' => '\stdClass'];
-
-        $adapter = new ArrayAdapter($schema);
-        $this->assertEquals('\stdClass', $adapter->getSubjectClass());
     }
 
     public function testInitialState()
     {
         $schema = ['initialState' => 'new'];
 
-        $adapter = new ArrayAdapter($schema);
+        $adapter = new ArrayFactory($schema);
         $this->assertEquals('new', $adapter->getInitialState());
     }
 
@@ -53,31 +43,21 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
 
         $schema = [
             'name' => 'testSchema',
-            'subjectClass' => '\stdClass',
             'initialState' => 'testState',
             'states' => [
                 [
                     'name' => 'testState',
-                    'comment' => 'comment',
-                    'flags' => [
-                        'hasFlag' => true
-                    ],
                     'events' => [
                         [
                             'name' => 'eventA',
-                            'comment' => 'comment',
                             'targetState' => 'pending',
                             'errorState' => 'error',
-                            'commands' => [
-                                $command
-                            ]
+                            'command' => $command
                         ],
                         [
                             'name' => 'eventB',
-                            'comment' => 'comment',
                             'targetState' => 'pending',
                             'errorState' => 'error',
-                            'timeout' => new \DateInterval('PT10S'),
                         ]
                     ],
                 ]
@@ -86,7 +66,6 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
 
         $expected = new Process(
             'testSchema',
-            '\stdClass',
             'testState',
             [
                 new State(
@@ -96,28 +75,19 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
                             'eventA',
                             'pending',
                             'error',
-                            new CommandCollection([$command]),
-                            null,
-                            ['comment' => 'comment']
+                            $command
                         ),
                         new Event(
                             'eventB',
                             'pending',
-                            'error',
-                            new CommandCollection(),
-                            new Timeout(new \DateInterval('PT10S')),
-                            ['comment' => 'comment']
+                            'error'
                         )
-                    ],
-                    [
-                        new Flag('hasFlag', true)
-                    ],
-                    ['comment' => 'comment']
+                    ]
                 )
             ]
         );
 
-        $adapter = new ArrayAdapter($schema);
+        $adapter = new ArrayFactory($schema);
         $this->assertEquals($expected, $adapter->getProcess());
     }
 }

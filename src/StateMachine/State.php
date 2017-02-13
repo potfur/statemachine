@@ -1,15 +1,28 @@
 <?php
 
+declare(strict_types = 1);
+
+/*
+* This file is part of the statemachine package
+*
+* (c) Michal Wachowski <wachowski.michal@gmail.com>
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
+
 namespace StateMachine;
 
+use StateMachine\Collection\Events;
 use StateMachine\Exception\InvalidArgumentException;
+use StateMachine\Payload;
 
 /**
  * State machine state representation
  *
  * @package StateMachine
  */
-final class State implements StateInterface
+final class State
 {
     /**
      * State name
@@ -21,53 +34,33 @@ final class State implements StateInterface
     /**
      * State events
      *
-     * @var GenericCollection
+     * @var Events
      */
     private $events;
 
     /**
-     * State flags
-     *
-     * @var GenericCollection
-     */
-    private $flags;
-
-    /**
      * Additional attributes
-
      *
-*@var AttributeCollectionInterface
+     * @var Attributes
      */
     private $attributes;
 
     /**
-     * @param string           $name state name
-     * @param EventInterface[] $events list of events in state
-     * @param Flag[]           $flags array with state flags
-     * @param array           $attributes additional attributes like comment etc.
-     */
-    public function __construct($name, array $events = [], array $flags = [], array $attributes = [])
-    {
-        $this->assertName($name);
-
-        $this->name = $name;
-        $this->events = new GenericCollection($events, '\StateMachine\EventInterface');
-        $this->flags = new GenericCollection($flags, '\StateMachine\Flag');
-        $this->attributes = new AttributeCollection($attributes);
-    }
-
-    /**
-     * Assert if name is non empty string
-     *
-     * @param string $name
+     * @param string  $name       state name
+     * @param Event[] $events     list of events in state
+     * @param array   $attributes additional attributes
      *
      * @throws InvalidArgumentException
      */
-    private function assertName($name)
+    public function __construct($name, array $events = [], array $attributes = [])
     {
         if (empty($name)) {
-            throw new InvalidArgumentException('Invalid state name, can not be empty string');
+            throw InvalidArgumentException::emptyStateName();
         }
+
+        $this->name = $name;
+        $this->events = new Events($events);
+        $this->attributes = new Attributes($attributes);
     }
 
     /**
@@ -75,51 +68,17 @@ final class State implements StateInterface
      *
      * @return string
      */
-    public function getName()
+    public function name(): string
     {
         return $this->name;
     }
 
     /**
-     * Return flag collection
-     *
-     * @return Flag[]
-     */
-    public function getFlags()
-    {
-        return $this->flags->all();
-    }
-
-    /**
-     * Return true if flag with given name exist
-     *
-     * @param string $name
-     *
-     * @return bool
-     */
-    public function hasFlag($name)
-    {
-        return $this->flags->has($name);
-    }
-
-    /**
-     * Return flag with given name
-     *
-     * @param string $name
-     *
-     * @return Flag
-     */
-    public function getFlag($name)
-    {
-        return $this->flags->get($name);
-    }
-
-    /**
      * Return event collection
      *
-     * @return EventInterface[]
+     * @return Event[]
      */
-    public function getEvents()
+    public function events(): array
     {
         return $this->events->all();
     }
@@ -131,7 +90,7 @@ final class State implements StateInterface
      *
      * @return bool
      */
-    public function hasEvent($name)
+    public function hasEvent($name): bool
     {
         return $this->events->has($name);
     }
@@ -141,20 +100,19 @@ final class State implements StateInterface
      *
      * @param string $name
      *
-     * @return EventInterface
+     * @return Event
      */
-    public function getEvent($name)
+    public function event($name): Event
     {
         return $this->events->get($name);
     }
 
     /**
      * Return attributes container
-
      *
-*@return AttributeCollectionInterface
+     * @return Attributes
      */
-    public function getAttributes()
+    public function attributes(): Attributes
     {
         return $this->attributes;
     }
@@ -163,14 +121,14 @@ final class State implements StateInterface
      * Triggers event with given name and payload
      * Returns name of next state or null if no change
      *
-     * @param string           $name
-     * @param PayloadInterface $payload
+     * @param string  $name
+     * @param Payload $payload
      *
-     * @return string
+     * @return null|string
      */
-    public function triggerEvent($name, PayloadInterface $payload)
+    public function triggerEvent($name, Payload $payload)
     {
-        return $this->getEvent($name)->trigger($payload);
+        return $this->event($name)->trigger($payload);
     }
 
     /**
@@ -178,8 +136,8 @@ final class State implements StateInterface
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->getName();
+        return $this->name();
     }
 }

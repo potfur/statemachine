@@ -1,6 +1,19 @@
 <?php
 
+declare(strict_types = 1);
+
+/*
+* This file is part of the statemachine package
+*
+* (c) Michal Wachowski <wachowski.michal@gmail.com>
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
+
 namespace StateMachine;
+
+use StateMachine\Payload;
 
 /**
  * State machine process interface
@@ -14,58 +27,39 @@ interface ProcessInterface
      *
      * @return string
      */
-    public function getName();
-
-    /**
-     * Return entity class
-     * Fully qualified subject class for which process is defined
-     *
-     * @return string
-     */
-    public function getSubjectClass();
+    public function name(): string;
 
     /**
      * Return initial state
-     * All entities without state will have this one
      *
-     * @return string
+     * @return State
      */
-    public function getInitialStateName();
+    public function initialState(): State;
+
+    /**
+     * Return state by name
+     *
+     * @param $name
+     *
+     * @return State
+     */
+    public function state($name): State;
 
     /**
      * Return all states
      *
      * @return State[]
      */
-    public function getStates();
+    public function states(): array;
 
     /**
      * Trigger event for payload
-     * Return array with all transitional state names
+     * Return next state name
      *
-     * @param string           $event
-     * @param PayloadInterface $payload
+     * @param string  $event
+     * @param Payload $payload
      *
-     * @return array
+     * @return string
      */
-    public function triggerEvent($event, PayloadInterface $payload);
-
-    /**
-     * Return true if payloads state has timeout event
-     *
-     * @param PayloadInterface $payload
-     *
-     * @return bool
-     */
-    public function hasTimeout(PayloadInterface $payload);
-
-    /**
-     * Return timeout object for payloads state timeout event
-     *
-     * @param PayloadInterface $payload
-     * @param \DateTime        $now date will be used as reference for timeouts defined as intervals
-     *
-     * @return PayloadTimeout
-     */
-    public function getTimeout(PayloadInterface $payload, \DateTime $now);
+    public function triggerEvent($event, Payload $payload): string;
 }

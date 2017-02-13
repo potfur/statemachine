@@ -9,12 +9,10 @@
     }
   ],
   "require": {
-    "php": ">=5.4"
+    "php": ">=7.0"
   },
   "require-dev": {
-    "phpunit/phpunit": "~4.6",
-    "phpmd/phpmd": "~2.2",
-    "squizlabs/php_codesniffer": "~2.3"
+    "phpunit/phpunit": "^5.4"
   },
   "config": {
     "bin-dir": "bin"
@@ -22,7 +20,7 @@
   "autoload": {
     "psr-0": {"StateMachine\\": "./src/"}
   },
-  "autoload-dev": {
-    "psr-0": {"Fake\\": "./tests/integration"}
+  "suggest": {
+    "potfur/statemachine_renderer": "Easies designing of processes by rendering graphs in PNG or SVG"
   }
 }

@@ -1,10 +1,22 @@
 <?php
 
+declare(strict_types = 1);
+
+/*
+* This file is part of the statemachine package
+*
+* (c) Michal Wachowski <wachowski.michal@gmail.com>
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
+
 namespace StateMachine;
 
+use StateMachine\Collection\States;
 use StateMachine\Exception\InvalidArgumentException;
 use StateMachine\Exception\InvalidStateException;
-use StateMachine\Exception\InvalidSubjectException;
+use StateMachine\Payload;
 
 /**
  * State machine process
@@ -13,24 +25,12 @@ use StateMachine\Exception\InvalidSubjectException;
  */
 final class Process implements ProcessInterface
 {
-    use GetTypeTrait;
-
-    const ON_STATE_WAS_SET = 'onStateWasSet';
-    const ON_TIME_OUT = 'onTimeout';
-
     /**
      * Process/schema name
      *
      * @var string
      */
     private $name;
-
-    /**
-     * Context class
-     *
-     * @var string
-     */
-    private $subjectClass;
 
     /**
      * Initial state
@@ -42,44 +42,30 @@ final class Process implements ProcessInterface
     /**
      * Schema states
      *
-     * @var GenericCollection|StateInterface[]
+     * @var States|State[]
      */
     private $states = [];
 
     /**
-     * @param string           $name         process/schema name
-     * @param string           $subjectClass context class name
-     * @param string           $initialState initial state for entities starting process
-     * @param StateInterface[] $states
+     * @param string  $name         process/schema name
+     * @param string  $initialState initial state for entities starting process
+     * @param State[] $states
      *
-     * @throws InvalidStateException
+     * @throws InvalidArgumentException|InvalidStateException
      */
-    public function __construct($name, $subjectClass, $initialState, array $states)
-    {
-        $this->assertName($name);
-
-        $this->name = $name;
-        $this->subjectClass = $subjectClass;
-        $this->initialState = $initialState;
-
-        $this->states = new GenericCollection($states, '\StateMachine\StateInterface');
-
-        if (!$this->states->has($this->initialState)) {
-            throw new InvalidStateException(sprintf('Initial state "%s" does not exist in process "%s"', $this->initialState, $this->getName()));
-        }
-    }
-
-    /**
-     * Assert if name is non empty string
-     *
-     * @param string $name
-     *
-     * @throws InvalidArgumentException
-     */
-    private function assertName($name)
+    public function __construct($name, $initialState, array $states)
     {
         if (empty($name)) {
-            throw new InvalidArgumentException('Invalid process name, can not be empty string');
+            throw InvalidArgumentException::emptyProcessName();
+        }
+
+        $this->name = $name;
+        $this->initialState = $initialState;
+
+        $this->states = new States($states);
+
+        if (!$this->states->has($this->initialState)) {
+            throw InvalidStateException::missingInitialState($this->name, $this->initialState);
         }
     }
 
@@ -88,41 +74,20 @@ final class Process implements ProcessInterface
      *
      * @return string
      */
-    public function getName()
+    public function name(): string
     {
         return $this->name;
-    }
-
-    /**
-     * Return entity class
-     * Fully qualified subject class for which process is defined
-     *
-     * @return string
-     */
-    public function getSubjectClass()
-    {
-        return $this->subjectClass;
     }
 
     /**
      * Return initial state
      * All entities without state will have this one
      *
-     * @return string
+     * @return State
      */
-    public function getInitialStateName()
+    public function initialState(): State
     {
-        return $this->initialState;
-    }
-
-    /**
-     * Return all states
-     *
-     * @return State[]
-     */
-    public function getStates()
-    {
-        return $this->states->all();
+        return $this->state($this->initialState);
     }
 
     /**
@@ -132,126 +97,32 @@ final class Process implements ProcessInterface
      *
      * @return State
      */
-    private function getState($name)
+    public function state($name): State
     {
         return $this->states->get($name);
     }
 
     /**
+     * Return all states
+     *
+     * @return State[]
+     */
+    public function states(): array
+    {
+        return $this->states->all();
+    }
+
+    /**
      * Trigger event for payload
-     * Return array with all transitional state names
+     * Return next state name
      *
-     * @param string           $event
-     * @param PayloadInterface $payload
+     * @param string  $event
+     * @param Payload $payload
      *
-     * @return array
+     * @return string
      */
-    public function triggerEvent($event, PayloadInterface $payload)
+    public function triggerEvent($event, Payload $payload): string
     {
-        $this->assertPayloadSubject($payload);
-
-        if ($payload->getState() === null) {
-            $payload->setState($this->getInitialStateName());
-        }
-
-        $state = $this->getState($payload->getState());
-
-        $result = $state->triggerEvent($event, $payload);
-        if ($result === null) {
-            return $payload->getHistory();
-        }
-
-        $state = $this->getState($result);
-
-        $this->updatePayload($state, $payload);
-        $this->handleOnStateWasSet($state, $payload);
-
-        return $payload->getHistory();
-    }
-
-    /**
-     * Assert if payload subject is instance of expected class
-     *
-     * @param PayloadInterface $payload
-     *
-     * @throws InvalidSubjectException
-     */
-    private function assertPayloadSubject(PayloadInterface $payload)
-    {
-        $subject = $payload->getSubject();
-        $class = $this->subjectClass;
-
-        if (!$subject instanceof $class) {
-            throw new InvalidSubjectException(sprintf('Unable to trigger with invalid payload in process "%s" - got "%s", expected "%s"', $this->getName(), $this->getType($subject), $class));
-        }
-    }
-
-    /**
-     * Handles onStateWasSet event
-     * Returns true if there was state change
-     *
-     * @param StateInterface   $state
-     * @param PayloadInterface $payload
-     *
-     * @return StateInterface|null
-     */
-    private function handleOnStateWasSet(StateInterface $state, PayloadInterface $payload)
-    {
-        while ($state->hasEvent(self::ON_STATE_WAS_SET)) {
-            $newState = $state->triggerEvent(self::ON_STATE_WAS_SET, $payload);
-            if ($newState === null) {
-                break;
-            }
-
-            $state = $this->getState($newState);
-            $this->updatePayload($state, $payload);
-        }
-    }
-
-    /**
-     * Update payload with new state data
-     *
-     * @param StateInterface   $state
-     * @param PayloadInterface $payload
-     */
-    private function updatePayload(StateInterface $state, PayloadInterface $payload)
-    {
-        $payload->setState($state->getName());
-        foreach ((array) $state->getFlags() as $flag) {
-            $payload->setFlag($flag);
-        }
-    }
-
-    /**
-     * Return true if payloads state has timeout event
-     *
-     * @param PayloadInterface $payload
-     *
-     * @return bool
-     */
-    public function hasTimeout(PayloadInterface $payload)
-    {
-        return $this->getState($payload->getState())->hasEvent(self::ON_TIME_OUT);
-    }
-
-    /**
-     * Return timeout object for payloads state timeout event
-     *
-     * @param PayloadInterface $payload
-     * @param \DateTime        $now date will be used as reference for timeouts defined as intervals
-     *
-     * @return PayloadTimeout
-     */
-    public function getTimeout(PayloadInterface $payload, \DateTime $now)
-    {
-        $state = $this->getState($payload->getState());
-        $event = $state->getEvent(self::ON_TIME_OUT);
-
-        return new PayloadTimeout(
-            $state->getName(),
-            $event->getName(),
-            $payload->getIdentifier(),
-            $event->timeoutAt($now)
-        );
+        return $this->state($payload->state())->triggerEvent($event, $payload);
     }
 }

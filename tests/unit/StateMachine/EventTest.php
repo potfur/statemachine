@@ -9,7 +9,12 @@
 * file that was distributed with this source code.
 */
 
-namespace StateMachine;
+namespace unit\StateMachine;
+
+use StateMachine\Attributes;
+use StateMachine\Event;
+use StateMachine\Exception\InvalidArgumentException;
+use StateMachine\PayloadEnvelope;
 
 class CommandMock
 {
@@ -28,74 +33,36 @@ class CommandMock
 
 class EventTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @expectedException \StateMachine\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid event name, can not be empty string
-     */
     public function testNameIsNull()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid event name, can not be empty string');
+
         new Event('');
     }
 
     public function testName()
     {
         $event = new Event('eventName');
-        $this->assertEquals('eventName', $event->getName());
+        $this->assertEquals('eventName', $event->name());
     }
 
     public function testTargetState()
     {
         $event = new Event('eventName', 'targetState');
-        $this->assertEquals('targetState', $event->getTargetState());
+        $this->assertEquals('targetState', $event->targetState());
     }
 
     public function testErrorState()
     {
         $event = new Event('eventName', null, 'errorState');
-        $this->assertEquals('errorState', $event->getErrorState());
-    }
-
-    public function testStates()
-    {
-        $expected = [
-            'target' => 'targetState',
-            'error' => 'errorState'
-        ];
-
-        $event = new Event('eventName', 'targetState', 'errorState');
-        $this->assertEquals($expected, $event->getStates());
+        $this->assertEquals('errorState', $event->errorState());
     }
 
     public function testAttributes()
     {
-        $event = new Event('eventName', null, 'errorState', null, null, []);
-        $this->assertInstanceOf('\StateMachine\AttributeCollectionInterface', $event->getAttributes());
-    }
-
-    public function testHasTimeout()
-    {
-        $timeout = new Timeout('PT1S');
-
-        $event = new Event('eventName', null, null, null, $timeout);
-        $this->assertEquals(true, $event->hasTimeout());
-    }
-
-    public function testGetTimeout()
-    {
-        $timeout = new Timeout('PT1S');
-
-        $event = new Event('eventName', null, null, null, $timeout);
-        $this->assertEquals($timeout, $event->getTimeout());
-    }
-
-    public function testTimeoutAt()
-    {
-        $timeout = new Timeout('PT1S');
-        $now = new \DateTime('2015-03-31 10:10:10');
-        $expected = new \DateTime('2015-03-31 10:10:11');
-
-        $event = new Event('eventName', null, null, null, new Timeout($timeout));
-        $this->assertEquals($expected, $event->timeoutAt($now));
+        $event = new Event('eventName', null, 'errorState', null, []);
+        $this->assertInstanceOf(Attributes::class, $event->attributes());
     }
 
     /**
@@ -103,11 +70,9 @@ class EventTest extends \PHPUnit_Framework_TestCase
      */
     public function testTrigger($targetState, $errorState, $result, $expected)
     {
-        $payload = $this->getMock('\StateMachine\PayloadInterface');
+        $payload = PayloadEnvelope::wrap('stuff');
 
-        $commands = new CommandCollection([new CommandMock($result)]);
-
-        $event = new Event('eventName', $targetState, $errorState, $commands);
+        $event = new Event('eventName', $targetState, $errorState, function() use ($result) { return $result; });
 
         $this->assertEquals($expected, $event->trigger($payload));
     }
